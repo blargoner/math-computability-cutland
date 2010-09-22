@@ -1,0 +1,1502 @@
+% John Peloquin
+% Exercises from Computability: An introduction to recursive function theory
+\documentclass[letterpaper]{article}
+\usepackage{amsmath,amssymb,amsthm,fourier,enumitem,xifthen}
+
+\newcommand{\exercise}[2][]{\noindent\textbf{Exercise~{#2}}\ifthenelse{\isempty{#1}}{\textbf{.}}{ ({#1})\textbf{.}}}
+
+\newcommand{\A}{\mathcal{A}}
+\newcommand{\B}{\mathcal{B}}
+\newcommand{\C}{\mathcal{C}}
+\newcommand{\D}{\mathcal{D}}
+\newcommand{\E}{\mathcal{E}}
+\newcommand{\F}{\mathcal{F}}
+\newcommand{\T}{\mathcal{T}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\PRR}{\mathcal{PR}}
+\newcommand{\MUR}{\mathcal{R}_0}
+\newcommand{\PAR}{\mathcal{R}}
+\renewcommand{\P}{\mathcal{P}}
+
+\newcommand{\union}{\cup}
+\newcommand{\sect}{\cap}
+\newcommand{\dom}{\mathrm{Dom}}
+\newcommand{\ran}{\mathrm{Ran}}
+\newcommand{\tminus}{\mathop{\overset{.}{-}}}
+\newcommand{\si}{\mathrm{si}}
+\newcommand{\sic}{\overline{\si}}
+\newcommand{\qt}{\mathrm{qt}}
+\renewcommand{\rm}{\mathrm{rm}}
+\renewcommand{\div}{\mathrm{div}}
+\newcommand{\lcm}{\mathrm{LCM}}
+\newcommand{\hcf}{\mathrm{HCF}}
+\newcommand{\sub}{\mathrm{Sub}}
+\newcommand{\mr}{\mathrel{\le_{\mathrm{m}}}}
+\newcommand{\mR}{\mathrel{<_{\mathrm{m}}}}
+\newcommand{\me}{\mathrel{\equiv_{\mathrm{m}}}}
+\newcommand{\tr}{\mathrel{\le_{\mathrm{T}}}}
+\newcommand{\tR}{\mathrel{<_{\mathrm{T}}}}
+\newcommand{\te}{\mathrel{\equiv_{\mathrm{T}}}}
+\newcommand{\fsubseteq}{\mathrel{\subseteq_{\mathrm{F}}}}
+
+\newcommand{\floor}[1]{\left\lfloor{#1}\right\rfloor}
+\newcommand{\card}[1]{|{#1}|}
+\newcommand{\func}[2]{f_{#1}^{(#2)}}
+\newcommand{\funcr}[3]{f_{{#1},{#2}}^{(#3)}}
+\newcommand{\dg}[1]{\mathbf{{#1}}}
+\newcommand{\code}[1]{\widetilde{{#1}}}
+
+\newcommand{\bigunion}{\bigcup}
+\newcommand{\biglor}{\bigvee}
+\newcommand{\lub}{\cup}
+
+\newcommand{\smn}{$s$-$m$-$n$}
+
+\theoremstyle{plain}
+\newtheorem*{lem}{Lemma}
+\newtheorem*{thm}{Theorem}
+
+\theoremstyle{definition}
+\newtheorem*{defn}{Definition}
+
+\theoremstyle{remark}
+\newtheorem*{rmk}{Remark}
+
+\title{Exercises from \emph{Computability}}
+\author{John Peloquin}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section*{Chapter~1}
+\subsection*{Exercises~3.3}
+\exercise{1}
+We show that the functions below are computable by exhibiting procedures which compute them.
+\begin{enumerate}
+\item[(a)]
+\begin{tabular}{p{150px}l}
+$f(x)=\begin{cases}0&\text{if }x=0\\1&\text{if }x\ne0\end{cases}$&
+\begin{tabular}{rl}
+1.&J(1,2,4)\\
+2.&Z(1)\\
+3.&S(1)
+\end{tabular}
+\end{tabular}
+
+\item[(b)]
+\begin{tabular}{p{150px}l}
+$f(x)=5$&
+\begin{tabular}{rl}
+1.&Z(1)\\
+2.&S(1)\\
+$\vdots$&$\vdots$\\
+6.&S(1)
+\end{tabular}
+\end{tabular}
+
+\item[(c)]
+\begin{tabular}{p{150px}l}
+$f(x,y)=\begin{cases}0&\text{if }x=y\\1&\text{if }x\ne y\end{cases}$&
+Same procedure as in~(a).
+\end{tabular}
+
+\item[(d)]
+\begin{tabular}{p{150px}l}
+$f(x,y)=\begin{cases}0&\text{if }x\le y\\1&\text{if }x>y\end{cases}$&
+\begin{tabular}{rl}
+1.&J(1,3,5)\\
+2.&J(2,3,7)\\
+3.&S(3)\\
+4.&J(1,1,1)\\
+5.&Z(1)\\
+6.&J(1,1,9)\\
+7.&Z(1)\\
+8.&S(1)
+\end{tabular}
+\end{tabular}
+
+The idea in this procedure is to run a counter (in~$R_3$) which is repeatedly checked against first~$x$ and then~$y$. If $x$~is hit first, we know $x\le y$. If $y$~is hit first, we know $y<x$.
+
+\item[(e)]
+\begin{tabular}{p{200px}l}
+$f(x)=\begin{cases}\tfrac{1}{3}x&\text{if }x\text{ is a multiple of~3}\\\text{undefined}&\text{otherwise}\end{cases}$&
+See Example~3.3(c).
+\end{tabular}
+
+\item[(f)] $f(x)=\floor{2x/3}$
+
+We merely sketch a procedure: first load~$2x$ into a register. Run a counter~$k$ in one register and $3(k+1)$ in another register, stopping at the least~$k$ such that $3(k+1)>2x$. Then $k$~is the desired value.
+\end{enumerate}
+
+\exercise{2}
+Let $P$~be the program in Example~2.1. We claim
+$$\func{P}{2}=
+\begin{cases}
+x-y&\text{if }x\ge y\\
+\text{undefined}&\text{otherwise}
+\end{cases}$$
+\begin{proof}
+We note that $P$~repeatedly checks whether $r_1=r_2$, and if not increments~$r_2$ as well as the counter~$r_3$. If and when $r_1=r_2$, $P$~halts and returns the value~$r_3$.
+
+Clearly then if $x<y$, $P$~does not halt. If $x\ge y$, then $P$~returns the value~$k$ satisfying $y+k=x$; in other words, $P$~returns $x-y$ as desired.
+\end{proof}
+
+\exercise{3}
+Let $P$~be a program with no jump instructions. Then there exists $m\in\N$ such that either
+$$\func{P}{1}(x)=m\qquad\text{or}\qquad\func{P}{1}(x)=m+x$$
+for all $x\in\N$.
+\begin{proof}
+We prove a more general claim. Let $\funcr{P}{R_k}{1}(x)$~denote the final contents of the register~$R_k$ under the computation~$P(x)$ (or be undefined if $P(x)$~does not halt). We claim that for each $k\ge1$, there exists $m_k\in\N$ such that either $\funcr{P}{R_k}{1}(x)=m_k$ or $\funcr{P}{R_k}{1}(x)=m_k+x$. The result then follows since $\func{P}{1}(x)=\funcr{P}{R_1}{1}(x)$.
+
+We prove the claim by induction on the length~$n$ of~$P$. If $n=0$, then trivially $\funcr{P}{R_1}{1}(x)=x$ and $\funcr{P}{R_k}{1}(x)=0$ for all $k>1$, so the claim holds. Now suppose $n>0$ and the claim holds for all programs of length $n-1$ with no jump instructions. Let $P^*$~be the program consisting of the first $n-1$ instructions of~$P$. Then by assumption the claim holds for~$P^*$, and hence the contents of register~$R_k$ after the first $n-1$ instructions in the computation~$P(x)$ is given by $\funcr{P^*}{R_k}{1}(x)$, which is $m_k$ or $m_k+x$ for some $m_k\in\N$.
+
+Now consider instruction~$I_n$ in~$P$ by cases:
+\begin{enumerate}[itemsep=0pt]
+\item[(i)] If $I_n$~is Z(q), then $\funcr{P}{R_q}{1}(x)=0$.
+\item[(ii)] If $I_n$~is S(q), then $\funcr{P}{R_q}{1}(x)=\funcr{P^*}{R_q}{1}(x)+1$, giving either $m_q+1$ or $(m_q+1)+x$.
+\item[(iii)] If $I_n$~is T(p,q), then $\funcr{P}{R_q}{1}(x)=\funcr{P^*}{R_p}{1}(x)$, giving either $m_p$ or $m_p+x$.
+\end{enumerate}
+\noindent In all cases, $\funcr{P}{R_k}{1}(x)=\funcr{P^*}{R_k}{1}(x)$ for all $k\ne q$. Therefore $\funcr{P}{R_k}{1}(x)$~is of the desired form for all $k\ge1$, so the claim holds for~$P$ as desired. 
+\end{proof}
+
+\exercise{4}
+For each transfer instruction T($m$,$n$), with $m,n\ge 1$, there exists a program~$P_{m,n}$ having the same effect on the register machine configuration and using no transfer instructions.
+\begin{proof}
+For $m=n$, let $P_{m,n}$~be the empty program. For $m\ne n$, let $P_{m,n}$~be given by:
+\begin{center}
+\begin{tabular}{rl}
+1.&Z($n$)\\
+2.&J($m$,$n$,5)\\
+3.&S($n$)\\
+4.&J(1,1,2)
+\end{tabular}
+\end{center}
+\end{proof}
+
+\section*{Chapter~2}
+\subsection*{Exercises~3.4}
+\exercise{1}
+For every $m\in\N$, the functions $\mathbf{m}(x)=m$ and~$mx$, are computable.
+\begin{proof}
+We proceed by induction on~$m$.
+
+For the first class of functions, we know that $\mathbf{0}$~is computable by Lemma~1.1(a). Suppose that $\mathbf{m}$~is computable. Then $\mathbf{m+1}$ is obtained by composition of $\mathbf{m}$~and the successor function, and hence is computable by Lemma~1.1(b) and Theorem~3.1.
+
+For the second class of functions, $0x=\mathbf{0}$ is computable. Now suppose $mx$~is computable. Since
+$$(m+1)x=mx+x$$
+is simply the composite of~$mx$ and the identity map~$x$ with the addition function, it is also computable by Theorem~3.1.
+\end{proof}
+
+\exercise{3}
+Let $g(x)$~be total computable. Define a binary predicate~$M(x,y)$ by
+$$M(x,y)\equiv g(x)=y$$
+Then $M(x,y)$~is decidable.
+\begin{proof}
+We must show that the characteristic function
+$$\varphi_M(x,y)=
+\begin{cases}
+1&\text{if }M(x,y)\\
+0&\text{otherwise}
+\end{cases}=
+\begin{cases}
+1&\text{if }g(x)=y\\
+0&\text{otherwise}
+\end{cases}$$
+is computable. Let $G$~be a procedure in standard form computing~$g$ and let $k$~be the number of instructions in~$G$ and $r=\rho(G)+1$. Define a procedure~$P$ as follows:
+\begin{center}
+\begin{tabular}{rl}
+1.&T(2,$r$)\\
+2.&Z(2)\\
+3.&$G$\\
+$3+k$.&J(1,$r$,$6+k$)\\
+$4+k$.&Z(1)\\
+$5+k$.&J(1,1,$8+k$)\\
+$6+k$.&Z(1)\\
+$7+k$.&S(1)
+\end{tabular}
+\end{center}
+Since $G$~is total, $P$~always halts, and $P$~computes~$\varphi_M$ as desired.
+\end{proof}
+
+\subsection*{Exercises~4.16}
+\exercise{1}
+We prove that the following functions are computable:
+\begin{enumerate}[itemsep=0pt]
+\item[(a)] Any polynomial function $a_0+a_1x+\cdots+a_nx^n$, where $a_0,\ldots,a_n\in\N$.
+\begin{proof}Note any~$x^k$ is just the composite of the constant function~$\mathbf{k}$ with the exponential function~$x^y$, and hence is computable. Therefore any term~$a_kx^k$ is computable since it is the composite of functions $\mathbf{a_k}$~and~$x^k$ with the product function~$xy$. Finally, a polynomial is just obtained from iterated composition of these terms with the sum function~$x+y$.
+\end{proof}
+\item[(b)] $\floor{\sqrt{x}}$\quad\emph{Proof:} $\floor{\sqrt{x}}=\mu z<x+2\,(x<z^2)\tminus 1$.
+\item[(c)] $\lcm(x,y)$\quad\emph{Proof:} $\lcm(x,y)=\mu z<xy(z>0\text{ and }x|z\text{ and }y|z)$.
+\item[(d)] $\hcf(x,y)$\quad\emph{Proof:} $\hcf(x,y)=\qt(\lcm(x,y),xy)$ (assumed $x,y>0$).
+\item[(e)] $f(x)=\text{number of prime divisors of }x$\quad\emph{Proof:} $f(x)=\sum_{z\le x}\Pr(\div(z,x)\cdot z)$.
+\item[(f)] $\varphi(x)$\quad\emph{Proof:} $\varphi(x)=\sum_{1\le z<x}\sic(\hcf(z,x)\tminus 1)$.
+\end{enumerate}
+
+\exercise{2}
+Let $\pi(x,y)=2^x(2y+1)-1$. Then $\pi$~is a computable bijection from~$\N^2$ to~$\N$, and the functions $\pi_1$, $\pi_2$ such that $\pi(\pi_1(n),\pi_2(n))=n$ for all~$n$ are computable.
+\begin{proof}
+Clearly $\pi$~is a computable function.
+
+To see $\pi$~is injective, suppose $\pi(v,w)=\pi(x,y)$ for $v,w,x,y\in\N$. Then we have $2^v(2w+1)=2^x(2y+1)$. If $v=0$ or $x=0$, then we must have both $v=0$ and $x=0$ lest one side of the equation be odd and the other even. It then also follows that $w=y$. If $v\ne0$ and $x\ne0$, note that $2^v|2^x(2y+1)$, but since $2^v$~is even and $2y+1$ is odd, we must have $2^v|2^x$. Similarly $2^x|2^v$. Therefore $2^v=2^x$, so $x=v$, and it then also follows that $w=y$. In either case, $(v,w)=(x,y)$, establishing injectivity of~$\pi$.
+
+To see $\pi$~is surjective, let $n\in\N$ be arbitrary and let $2^x$~be the highest power of~$2$ dividing~$n+1$ (note this is defined since $n+1\ne0$). Then the quotient of $n+1$ by~$2^x$ must be odd of the form $2y+1$, so $n=2^x(2y+1)-1=\pi(x,y)$.
+
+Note $\pi_1(n)=\mu z\le n+1(2^z>n+1)\tminus 1$ is clearly computable, from which it follows that $\pi_2(n)=\qt(2,\qt(2^{\pi_1(n)},n+1)\tminus 1)$ is also computable.
+\end{proof}
+
+\exercise{5}
+Recall any $x\in\N$ can be expressed uniquely in the form $x=\sum_{i=0}^\infty\alpha_i2^i$ where $\alpha_i\in\{0,1\}$ for all~$i$ (this is the \emph{binary expansion} of~$x$). Hence if $x>0$ there are unique expressions for~$x$ of the forms
+\begin{align*}
+x&=2^{b_1}+2^{b_2}+\cdots+2^{b_l}&&(l\ge1,\ 0\le b_1<b_2<\cdots<b_l)&&\text{ and}\\
+x&=2^{a_1}+2^{a_1+a_2+1}+\cdots+2^{a_1+\cdots+a_k+k-1}&&&&
+\end{align*}
+\noindent For these expressions, define $\alpha(i,x)=\alpha_i$ and
+$$l(x)=\begin{cases}
+l&\text{if }x>0\\
+0&\text{otherwise}
+\end{cases}
+\qquad
+b(i,x)=\begin{cases}
+b_i&\text{if }x>0,1\le i\le l\\
+0&\text{otherwise}
+\end{cases}
+\qquad
+a(i,x)=\begin{cases}
+a_i&\text{if }x>0,1\le i\le l\\
+0&\text{otherwise}
+\end{cases}$$
+Then $\alpha,l,b,a$ are all computable.
+\begin{proof}
+We exhibit each:
+\begin{enumerate}[itemsep=0pt]
+\item[(i)] To calculate~$\alpha_i$, we can right shift and then mod the binary expansion of~$x$ in order to isolate the $i$-th~bit, so $\alpha(i,x)=\rm(2,\qt(2^i,x))$, which is computable.
+\item[(ii)] Note $l$~is the number of~$1$'s in the binary expansion of~$x$, so $l(x)=\sum_{i\le x}\alpha(i,x)$, which is also computable.
+\item[(iii)] Note $b_i$~is the digit index of the $i$-th~$1$ in the binary expansion of~$x$ (if such a~$1$ exists), so we can calculate it by sequentially searching digits until we have accumulated $i$~$1$'s. Specifically,
+$$b(i,x)=\begin{cases}
+\mu z\le x\bigl(\,\sum_{j\le z}\alpha(j,x)=i\,\bigl)&\text{if }x>0\text{ and }1\le i\le l(x)\\
+0&\text{ otherwise}
+\end{cases}$$
+Therefore $b(i,x)$~is computable.
+\item[(iv)] Note $a_i$~measures the number of~$0$'s between the $(i-1)$-th and $i$-th~$1$'s in the binary expansion of~$x$ (where the $0$-th~$1$ fictionally occurs just prior to the start of the binary expansion). Therefore, for $x>0$ and $1\le i\le l(x)$, we obtain a recursive definition for $a(i,x)$ of the form
+\begin{align*}
+a(1,x)&=b(1,x)\\
+a(i+1,x)&=b(i+1,x)\tminus b(i,x)\tminus 1
+\end{align*}
+By cases, we set $a(i,x)=0$ otherwise. It follows that $a(i,x)$~is computable.
+\end{enumerate}
+\end{proof}
+\noindent This exercise demonstrates that the third expression for~$x$ above can be regarded as a coding for the sequence $(a_1,\ldots,a_l)$, and each~$a_i$ can be effectively calculated from~$x$. The coding uses a binary expansion like a delimited string, with $0$'s~acting as tally marks for the values in the sequence and $1$'s~acting as delimiters.
+
+As an example, consider the following coding:
+$$(1,2,3)\mapsto 100010010=1\underbrace{000}_31\underbrace{00}_21\underbrace{0}_1$$
+
+\subsection*{Exercises~5.4}
+\exercise{1}
+Let $f(x)$ be a total injective computable function. Then the inverse function~$f^{-1}(y)$ is computable.
+\begin{proof}
+Note $f^{-1}(y)=\mu z(f(z)=y)$.
+\end{proof}
+
+\section*{Chapter~3}
+\subsection*{Exercises~4.6}
+\exercise{1}
+The unary function computed by the Turing machine in Example~4.2 is $f(x)=\floor{\tfrac{x+1}{2}}$. \emph{Proof:} The machine starts with $x+1$ $1$'s on the tape, and then zeros out every other one, leaving~$\floor{\tfrac{x+1}{2}}$ remaining.
+
+\subsection*{Exercises~5.4}
+\exercise{1}
+Let $\Sigma=\{a,b\}$. We examine the ways in which the production
+$$(\pi)\ S_1bS_2aaS_3b\to S_3abS_1$$
+applies to the string $\sigma=babaabbaab$.
+
+The following are exhaustive possibilities:
+\begin{enumerate}[itemsep=0pt]
+\item[(1)] If the first~$b$ in~$\pi$ matches the first~$b$ in~$\sigma$, then $S_1=\Lambda$.
+\begin{enumerate}[itemsep=0pt]
+\item[(a)] If the~$aa$ in~$\pi$ matches the first~$aa$ in~$\sigma$, then $S_2=ab$ and $S_3=bbaa$. In this case the string generated is $bbaaab$.
+\item[(b)] If the~$aa$ in~$\pi$ matches the second~$aa$ in~$\sigma$, then $S_2=abaabb$ and $S_3=\Lambda$. In this case the string generated is~$ab$.
+\end{enumerate}
+\item[(2)] If the first~$b$ in~$\pi$ matches the second~$b$ in~$\sigma$, then $S_1=ba$.
+\begin{enumerate}[itemsep=0pt]
+\item[(a)] If the~$aa$ in~$\pi$ matches the first~$aa$ in~$\sigma$, then $S_2=\Lambda$ and $S_3=bbaa$. In this case the string generated is $bbaaabba$.
+\item[(b)] If the~$aa$ in~$\pi$ matches the second~$aa$ in~$\sigma$, then $S_2=aabb$ and $S_3=\Lambda$. In this case the string generated is $abba$.
+\end{enumerate}
+\item[(3)] If the first~$b$ in~$\pi$ matches the third~$b$ in~$\sigma$, then $S_1=babaa$, $S_2=b$, and $S_3=\Lambda$. The string generated is $abbabaa$.
+\item[(4)] If the first~$b$ in~$\pi$ matches the fourth~$b$ in~$\sigma$, then $S_1=babaab$ and $S_2=S_3=\Lambda$. The string generated is $abbabaab$.
+\end{enumerate}
+
+\subsection*{Exercises~7.2}
+\exercise{1}
+Suppose $f(x)$~and~$g(x)$ are effectively computable. Then
+$$h(x)=\begin{cases}
+x&\text{if }x\in\dom(f)\sect\dom(g)\\
+\text{undefined}&\text{otherwise}
+\end{cases}$$
+is URM-computable.
+\begin{proof}
+Since $f$~and~$g$ are computable, their values can be computed by algorithms. Consider the following algorithm to compute~$h(x)$: `Run an algorithm to compute~$f(x)$. If it halts, then run an algorithm to compute~$g(x)$. If it also halts, then return~$x$.' This algorithm computes~$h(x)$, for it halts (and returns~$x$) iff the algorithms for computing $f(x)$~and~$g(x)$ both halt, which occurs iff $x\in\dom(f)\sect\dom(g)$. By Church's Thesis then, it follows that $h$~is URM-computable.
+\end{proof}
+
+\section*{Chapter~4}
+\subsection*{Exercises~1.6}
+\exercise{1}
+\begin{enumerate}[itemsep=0pt]
+\item[(c)] Let $P$~be the program T(3,4), S(3), Z(1). Then
+\begin{align*}
+\beta(\mathrm{T(3,4)})&=4\pi(3-1,4-1)+2&\beta(\mathrm{S(3)})&=4(3-1)+1&\beta(\mathrm{Z(1)})&=4(1-1)\\
+	&=4[\,2^2(2\cdot 3+1)-1]+2&&=9&&=0\\
+	&=4\cdot 27+2&&&&\\
+	&=110&&&&
+\end{align*}
+Therefore $\gamma(P)=\tau(110,9,0)=2^{110}+2^{120}+2^{121}$.
+\item[(d)] Let $P=P_{100}$. Note $100=1100100_2=2^2+2^5+2^6$, so $a_1=2$, $a_2=2$, and $a_3=0$. Now $2=4\cdot 0+2$, hence $\beta^{-1}(2)=\mathrm{T(1,1)}$. Similarly $\beta^{-1}(0)=\mathrm{Z(1)}$. Therefore $P$~is the program T(1,1), T(1,1), Z(1).
+\end{enumerate}
+
+\subsection*{Exercises~2.3}
+\exercise{1}
+Let $f$~be computable. Then $f$~has infinitely many indices.
+\begin{proof}
+Write $f=\phi_k^{(n)}$, so $P_k$~computes~$f$. Set $r=\rho(P_k)+1$. Then for any fixed~$m$, the program
+\begin{center}
+\begin{tabular}{cl}
+$P_k$&\\
+Z(r)&\\
+$\vdots$&\quad $m$~times\\
+Z(r)&
+\end{tabular}
+\end{center}
+also computes~$f$. Denote this program by~$P_k^m$, so $\gamma(P_k^m)$~is also an index of~$f$. By the injectivity of~$\gamma$, the set $\Gamma=\{\,\gamma(P_k^m)\mid m\in\N\,\}$ gives infinitely many indices of~$f$.
+\end{proof}
+
+\subsection*{Exercises~3.2}
+\exercise{3}
+Let $f:\N\to\N$ be partial and $m\in\N$. There exists a non-computable function~$g$ such that $g(x)\simeq f(x)$ for $x\le m$.
+\begin{proof}
+Define $g$~as follows:
+$$g(x)\simeq\begin{cases}
+f(x)&\text{if }x\le m\\
+\phi_{x-(m+1)}(x)+1&\text{if }x>m\text{ and }\phi_{x-(m+1)}(x)\text{ is defined}\\
+0&\text{if }x>m\text{ and }\phi_{x-(m+1)}(x)\text{ is undefined}
+\end{cases}$$
+By construction, $g(x)\simeq f(x)$ for $x\le m$ and $g$~is non-computable since for any~$\phi_k$,
+$$g(k+m+1)\not\simeq\phi_k(k+m+1)$$
+\end{proof}
+\noindent Note that the above proof works by shifting the diagonal used in the diagonalization argument right by a finite number of places. A corollary of this exercise is that for any computable function~$\phi_k$, there exist non-computable functions agreeing with~$\phi_k$ for up to any finite number of values. 
+
+\bigskip
+\exercise{4}
+\begin{enumerate}[itemsep=0pt]
+\item[(a)] The set of all functions from~$\N$ to~$\N$ is uncountable.
+\begin{proof}
+The set is clearly infinite since, for example, there are infinitely many constant functions. The set is seen to be uncountably infinite using a standard diagonalization argument.
+\end{proof}
+\item[(b)] The set of all total non-computable functions from~$\N$ to~$\N$ is uncountable.
+\begin{proof}
+Let $\T$~be the set of all total functions from~$\N$ to~$\N$. Then it is immediate by diagonalization that $\T$~is uncountable. For each $\alpha\in\T$ define a function $f_{\alpha}:\N\to\N$ as follows:
+$$f_{\alpha}(n)=\begin{cases}
+\phi_n(n)+\alpha(n)+1&\text{if }\phi_n(n)\text{ is defined}\\
+\alpha(n)&\text{ otherwise}
+\end{cases}$$
+It is immediate that each $f_{\alpha}$~is total and non-computable. And clearly if $\alpha\ne\beta$, then $f_{\alpha}\ne f_{\beta}$. Therefore $\{\,f_{\alpha}\mid\alpha\in\T\,\}$ is uncountable, establishing the result.
+\end{proof}
+\end{enumerate}
+
+\subsection*{Exercises~4.4}
+\exercise{1}
+There is a total computable function~$k$ such that $k(n)$~is an index of the function~$\floor{\sqrt[n]{x}}$.
+\begin{proof}
+Note $f(x,y)=\floor{\sqrt[x]{y}}=\mu z(z^x>y)\tminus 1$ is computable. The result thus follows from the simple \smn\ theorem.
+\end{proof}
+
+\exercise{3}
+For fixed $n\ge1$, there is a total computable function~$s$ such that
+$$W_{s(x)}^{(n)}=\{\,(y_1,\ldots,y_n)\mid y_1+\cdots+y_n=x\,\}$$
+\begin{proof}
+Fix $n\ge1$ and define
+$$f(x,y_1,\ldots,y_n)=\begin{cases}
+1&\text{if }x=y_1+\cdots+y_n\\
+\text{undefined}&\text{otherwise}
+\end{cases}$$
+Clearly $f$~is computable, so $f=\phi_k^{(n)}$ for some index~$k$. By the \smn\ theorem, there exists a total computable function $s(x)=s_n^1(k,x)$ such that for all~$x$,
+$$\phi_{s(x)}^{(n)}(y_1,\ldots,y_n)=f(x,y_1,\ldots,y_n)$$
+Therefore by construction of~$f$, $W_{s(x)}^{(n)}$~is as desired.
+\end{proof}
+
+\exercise{4}
+The functions~$s^m_n$ in in the \smn\ theorem are primitive recursive.
+\begin{proof}
+We merely sketch: since the encoding and decoding functions used by each~$s^m_n$ are all primitive recursive, each~$s^m_n$ itself is also primitive recursive.
+\end{proof}
+
+\exercise[\smn\ theorem]{5} For each~$m$ there is a total computable $(m+1)$-ary function~$s^m$ such that for all $e,n,\vec{x}$,
+$$\phi_{s^m(e,\vec{x})}^{(n)}(\vec{y})\simeq\phi_e^{(m+n)}(\vec{x},\vec{y})$$
+\begin{proof}
+In the proof of Theorem~4.3, $n$~is used only to count how many registers should be right shifted initially. But since $P_e$~uses only registers $R_1,\ldots,R_{\rho(e)}$, it works equally well to shift $\rho(e)$~registers. Now $\rho(e)$~can be effectively computed from~$e$ by syntactically examining the finitely many instructions of~$P_e$. Therefore $n$~is not needed in the proof, and by constructing a similar proof but using~$\rho(e)$ instead of~$n$, one obtains a total computable function~$s^m$ as desired.
+\end{proof}
+
+\section*{Chapter~5}
+\subsection*{Exercises~1.5}
+\exercise{1}
+\begin{enumerate}
+\item[(i)] There exists a decidable predicate $Q(x,y,z)$ such that $y\in E_x$ iff $\exists z\,Q(x,y,z)$ and if $y\in E_x$ then $\phi_x((z)_1)=y$.
+\begin{proof}
+Note $y\in E_x$ iff there exists some~$s$ such that $\phi_x(s)=y$, that is, iff the computation~$P_x(s)$ halts with output~$y$ after a finite number~$t$ of steps. Thus under the effective coding $z=2^s3^t$ we define
+$$Q(x,y,z)\equiv S_1(x,s,y,t)=S_1(x,(z)_1,y,(z)_2)$$
+Now $Q$~is decidable by Corollary~1.3(a) and substitution, and the remaining properties follow easily.
+\end{proof}
+\item[(ii)] There exists a computable function $g(x,y)$ such that $y\in E_x$ iff $g(x,y)$ is defined, and if $y\in E_x$ then $g(x,y)\in W_x$ and $\phi_x(g(x,y))=y$.
+\begin{proof}
+Define $g(x,y)\simeq\bigl(\mu z\,Q(x,y,z)\bigr)_1$.
+\end{proof}
+\end{enumerate}
+
+\exercise{2}
+Suppose $f$~and~$g$ are unary computable functions. Then the function~$h$ defined by
+$$h(x)=\begin{cases}
+1&\text{if }x\in\dom(f)\union\dom(g)\\
+\text{undefined}&\text{otherwise}
+\end{cases}$$
+is computable.
+\begin{proof}
+Write $f=\phi_m$, $g=\phi_n$. Then $h(x)=\mathbf{1}(\mu t(H_1(m,x,t)\text{ or }H_1(n,x,t)))$.
+\end{proof}
+\noindent Note this exercise illustrates the theoretical possibility of effective \emph{multitasking} or \emph{multithreading}. Since any finite initial segment of a computation can be effectively simulated, a program can run through steps of multiple computations, giving the effect of `running multiple programs simultaneously' (see Example 3.7.1.2).
+
+\subsection*{Exercises~3.2}
+\begin{rmk}
+In these exercises we apply the \smn\ theorem and universal functions to prove effectiveness of operations on computable functions and predicates.
+\end{rmk}
+
+\exercise{1}
+There is a total computable function~$k(e)$ such that for all~$e$, if $\phi_e$~is the characteristic function of a decidable predicate~$M(x)$, then $\phi_{k(e)}$~is the characteristic function for its negation `not~$M(x)$'.
+\begin{proof}
+Define $f(e,x)=1-\phi_e(x)=1\tminus\psi_U(e,x)$. Then $f$~is computable, and for fixed~$e$ if $\phi_e(x)$~characterizes~$M(x)$, then $f(e,x)$ characterizes its negation. By the \smn\ theorem, there exists a total computable function~$k(e)$ such that $\phi_{k(e)}(x)\simeq f(e,x)$, establishing the result.
+\end{proof}
+
+\exercise{2}
+There exists a total computable function~$k(e)$ such that $E_{k(e)}=W_e$.
+\begin{proof}
+Define $f(e,x)=x\cdot\mathbf{1}(\phi_e(x))=x\cdot\mathbf{1}(\psi_U(e,x))$. Then $f$~is computable, so by the \smn\ theorem there exists a total computable function~$k(e)$ such that for all~$e$ $\phi_{k(e)}(x)\simeq f(e,x)$. By construction $x\in E_{k(e)}$ iff $x\in W_e$, so $E_{k(e)}=W_e$ as desired.
+\end{proof}
+
+\exercise{3}
+There exists a total computable function $s(x,y)$ such that, for all $x$~and~$y$, $E_{s(x,y)}=E_x\union E_y$.
+\begin{proof}
+For a pair $x$~and~$y$, we must construct a single computable function the range of which consists of all elements from the ranges of $\phi_x$~and~$\phi_y$. Thus we partition our domain and define the computable function
+$$f(x,y,z)\simeq\begin{cases}
+\phi_x\bigl(\frac{z}{2}\bigr)&\text{if }z\text{ is even}\\
+\phi_y\bigl(\frac{z-1}{2}\bigr)&\text{if }z\text{ is odd}\end{cases}$$
+By the \smn\ theorem, there exists a total computable function $s(x,y)$ such that for all $x$~and~$y$, $\phi_{s(x,y)}(z)\simeq f(x,y,z)$. Clearly $E_{s(x,y)}=E_x\union E_y$.
+\end{proof}
+
+\exercise[Effectiveness of substitution and minimalization]{5}
+\begin{enumerate}[itemsep=0pt]
+\item[(a)] Fix $m,n\ge1$. There is a total computable function $s(e,e_1,\ldots,e_m)$ such that
+$$\phi_{s(e,e_1,\ldots,e_m)}^{(n)}=\sub(\phi_e^{(m)}\,;\,\phi_{e_1}^{(n)},\ldots,\phi_{e_m}^{(n)})$$
+\begin{proof}
+Define the computable function
+$$f(e,e_1,\ldots,e_m,\vec{x})\simeq\phi_e^{(m)}\bigl(\phi_{e_1}^{(n)}(\vec{x}),\ldots,\phi_{e_m}^{(n)}(\vec{x})\bigr)$$
+Now apply the \smn\ theorem to obtain~$s$.
+\end{proof}
+\item[(b)] Fix $n\ge1$. There is a total computable function~$k(e)$ such that for all~$e$
+$$\phi_{k(e)}^{(n)}(\vec{x})\simeq\mu y\,\bigl(\phi_e^{(n+1)}(\vec{x},y)=0\bigr)$$
+\begin{proof}
+Define
+$$f(e,\vec{x})\simeq\mu y\,\bigl(\phi_e^{(n+1)}(\vec{x},y)=0\bigr)$$
+and apply the \smn\ theorem.
+\end{proof}
+\end{enumerate}
+
+\section*{Chapter~6}
+\subsection*{Exercises~1.8}
+
+\exercise{1}
+The following predicates are undecidable:
+\begin{enumerate}[itemsep=0pt]
+\item[(a)] `$x\in E_x$'
+\begin{proof}
+If `$x\in E_x$' is decidable, then the function
+$$f(x)=\begin{cases}
+x&\text{if }x\not\in E_x\\
+\text{undefined}&\text{if }x\in E_x
+\end{cases}$$
+is computable, say $f=\phi_m$. But then for all~$x$, $x\in E_m$ iff $x\not\in E_x$, so in particular $m\in E_m$ iff $m\not\in E_m$---a contradiction.
+\end{proof}
+\item[(b)] `$W_x=W_y$'
+\begin{proof}
+Fix~$k$ with $\phi_k=\mathbf{0}$. Then $W_x=W_k$ iff $\phi_x$~is total, which is undecidable, hence `$W_x=W_y$' is undecidable.
+\end{proof}
+\item[(c)] `$\phi_x(x)=0$'
+\begin{proof}
+Let $c(x)$~be the characteristic function of the predicate. Then for all~$x$, $c(x)=0$ iff $\phi_x(x)\ne 0$, hence $c\ne\phi_x$. Since $c$~differs from all unary computable functions, $c$~is not computable.
+\end{proof}
+\item[(d)] `$\phi_x(y)=0$'.\quad\emph{Proof:} `$\phi_x(x)=0$' reduces to this problem.
+\item[(e)] `$x\in E_y$'.\quad\emph{Proof:} `$x\in E_x$' reduces to this problem.
+\item[(f)] `$\phi_x$~is total and constant'
+\begin{proof}
+Apply Rice's Theorem, or note that `$\phi_x=\mathbf{0}$' reduces to this problem since $\phi_x=\mathbf{0}$ iff $\phi_x$~is total and constant and $\phi_x(0)=0$.
+\end{proof}
+\item[(g)] `$W_x=\emptyset$'.\quad\emph{Proof:} Apply Rice's Theorem with $\B=\{\,f\in\C_1\mid\dom f=\emptyset\,\}$.
+\item[(h)] `$E_x$~is infinite'.\quad\emph{Proof:} Apply Rice's Theorem with $\B=\{\,f\in\C_1\mid\ran f\text{ is infinite}\,\}$.
+\item[(i)] `$\phi_x=g$'.\quad\emph{Proof:} Apply Rice's Theorem with $\B=\{g\}$.
+\end{enumerate}
+
+\exercise{2} There does not exist a total computable function $f(x,y)$ such that for all $x,y$, if $P_x(y)$ halts, it does so in at most $f(x,y)$ steps.
+\begin{proof}
+Suppose such a function $f(x,y)$ exists. Construct a program~$P$ which, on input~$x$, runs for at least $f(x,x)+1$ steps and halts. Let $n=\gamma(P)$. Then $\phi_n$~is total, and the computation $\phi_n(n)$~runs for at least $f(n,n)+1>f(n,n)$ steps---contradicting the definition of~$f$.
+
+Alternately, define the predicate $H(x,y)\equiv H_1(x,y,f(x,y))$, which is decidable if $f(x,y)$ is computable. Note $H(x,y)$ holds iff $P_x(y)$ halts, so the halting problem reduces to~$H$.
+\end{proof}
+
+\subsection*{Exercises~6.14}
+\exercise{1}
+The following predicates are partially decidable:
+\begin{enumerate}[itemsep=0pt]
+\item[(a)] `$E_x^{(n)}\ne\emptyset$' ($n$~fixed)
+\begin{proof}
+The predicate `$y\in E_x^{(n)}$' is partially decidable (Example~6.7.1), hence $M(x)\equiv\exists y(y\in E_x^{(n)})$ is partially decidable by Corollary~6.6, and $E_x^{(n)}\ne\emptyset$ iff $M(x)$~holds.
+\end{proof}
+\item[(b)] `$\phi_x(y)$~is a perfect square'
+\begin{proof}
+Note $M(z)\equiv\text{`}z\text{ is a perfect square'}$ is decidable, and therefore partially decidable, so its partial characteristic function~$c_M$ is computable. Hence the partial characteristic function $c(x,y)$ of the desired predicate is computed by
+$$c(x,y)\simeq c_M(\phi_x(y))\simeq c_M(\psi_U(x,y))$$
+\end{proof}
+\item[(c)] `$n$~is a Fermat number'
+\begin{proof}
+By definition, $n$~is a Fermat number iff $\exists x\exists y\exists z(x^n+y^n=z^n)$, which is partially decidable by Corollary~6.6.
+\end{proof}
+\item[(d)] `There exists a run of exactly~$x$ consecutive~$7$'s in the decimal expansion of~$\pi$'
+\begin{proof}
+For fixed~$n$ it is decidable whether there exists such a run within the first~$n$ digits of the decimal expansion of~$\pi$. Denote this predicate $M(x,n)$. Then the desired predicate is given by $\exists n\,M(x,n)$, which is partially decidable by Theorem~6.4.
+\end{proof}
+\end{enumerate}
+
+\exercise{2}
+Let $G=\langle S\mid R\rangle$ be a finitely presented group. Then the word problem for~$G$ is partially decidable.
+\begin{proof}
+For a word $w\in G$, if $w=1$, then by definition of a group presentation this is a consequence of the relations in~$R$ and the group axioms, that is, the relation $w=1$ is derivable from~$R$ in~$G$. Derivability from~$R$ in~$G$ is partially decidable just like provability in the predicate calculus (Example~6.7.2). Therefore, the word problem is partially decidable.
+\end{proof}
+
+\exercise{4}
+Suppose $M(\vec{x})$~and~$N(\vec{x})$ are partially decidable. Then the predicates $M(\vec{x})\land N(\vec{x})$ and $M(\vec{x})\lor N(\vec{x})$ are partially decidable, but $\lnot M(\vec{x})$ is not necessarily partially decidable.
+\begin{proof}
+If $\phi_j^{(n)}$~and~$\phi_k^{(n)}$ are partial characteristic functions for $M$~and~$N$, respectively, then it follows that
+$$c_{M\land N}(\vec{x})\simeq\mathbf{1}(\phi_j^{(n)}(\vec{x}),\phi_k^{(n)}(\vec{x}))\simeq\mathbf{1}(\psi_U^{(n)}(j,\vec{x}),\psi_U^{(n)}(k,\vec{x}))$$
+is a computable partial characteristic function for $M\land N$, and similarly
+$$c_{M\lor N}(\vec{x})\simeq\mathbf{1}(\mu t[H_n(j,\vec{x},t)\lor H_n(k,\vec{x},t)])$$
+is a computable partial characteristic function for $M\lor N$.
+
+To see that $\lnot M(\vec{x})$ is not necessarily partially decidable, let $M(x)\equiv x\in W_x$. Then $M(x)$~is partially decidable, but $\lnot M(x)$ is not partially decidable (see Examples~6.2).
+\end{proof}
+\noindent Note the partial decision procedure for $M\lor N$ uses multithreading (see the comment after Exercise~5.1.5.2).
+
+\bigskip
+\exercise{5}
+Suppose $M(\vec{x},y)$ is partially decidable. Then
+\begin{enumerate}[itemsep=0pt]
+\item[(a)] `$\exists y<z\,M(\vec{x},y)$' is partially decidable.
+\begin{proof}
+Let $\phi_e^{(n+1)}$ denote the partial characteristic function for~$M$. Then the partial characteristic function for this predicate is computed by
+$$f(\vec{x},z)\simeq\mathbf{1}(\mu t[\exists y<z H_{n+1}(e,\vec{x},y,t)])$$
+\end{proof}
+\noindent Note this partial decision procedure multithreads computation of the values $\phi_e^{(n+1)}(0),\ldots,\phi_e^{(n+1)}(z-1)$.
+\item[(b)] `$\forall y<z\,M(\vec{x},y)$' is partially decidable.
+\begin{proof}
+The partial characteristic function is computed by
+$$f(\vec{x},z)\simeq\prod_{y<z}\phi_e^{(n+1)}(\vec{x},y)$$
+\end{proof}
+\item[(c)] `$\forall y\,M(\vec{x},y)$' is not necessarily partially decidable.
+\begin{proof}
+Set $M(x,y,t)\equiv\lnot H_1(x,y,t)$. Then $M$~is decidable but
+$$\forall t\,M(x,y,t)\iff P_x(y)\text{ diverges}$$
+which is not partially decidable (Corollary~6.12).
+\end{proof}
+\end{enumerate}
+
+\goodbreak
+\exercise{7}
+\begin{enumerate}[itemsep=0pt]
+\item[(a)] There does not exist a partially decidable predicate~$M(x)$ and total computable function~$k(x)$ such that $x\in W_x$ iff not~$M(k(x))$.
+\begin{proof}
+For such a predicate, $M(k(x))$~holds iff $x\not\in W_x$, which is not partially decidable (Example~6.2.4).
+\end{proof}
+\item[(b)] `$\phi_x$~is not total' is not partially decidable.
+\begin{proof}
+By the \smn\ theorem, there exists a total computable function~$k(x)$ such that for all~$x$,
+$$\phi_{k(x)}(y)=\begin{cases}
+1&\text{if }x\in W_x\\
+\text{undefined}&\text{otherwise}
+\end{cases}$$
+Thus $\phi_{k(x)}$~is not total iff $x\not\in W_x$, so it follows from part~(a) that `$\phi_x$~is not total' is not partially decidable.
+\end{proof}
+\item[(c)] `$\phi_x$~is total' is not partially decidable.
+\begin{proof}
+By the \smn\ theorem, there exists a total computable function~$k(x)$ such that for all~$x$,
+$$\phi_{k(x)}(y)=\begin{cases}
+1&\text{if }\lnot H_1(x,x,y)\\
+\text{undefined}&\text{otherwise}
+\end{cases}$$
+Thus $\phi_{k(x)}$~is total iff $x\not\in W_x$, so `$\phi_x$~is total' is not partially decidable by~(a).
+\end{proof}
+\noindent This proof illustrates an important technique: if $M(x)$~is partially decidable and $\lnot M(x)$~is not, then even though there is no partial decision procedure for~$\lnot M(x)$, we can characterize the failure to halt of a decision procedure for~$M(x)$ in terms of other properties of computable functions, and thereby establish a lack of partial decidability for such properties. This technique is facilitated by the effectiveness of simulation and the \smn\ theorem, and is also used in the proof of the Rice-Shapiro Theorem (Theorem 7.2.16).
+\end{enumerate}
+
+\exercise{9}
+Suppose $M(x_1,\ldots,x_n)$ is partially decidable and $g_1,\ldots,g_n$ are $m$-ary computable functions. Then the predicate
+$$N(\vec{y})\equiv M(g_1(\vec{y}),\ldots,g_n(\vec{y}))$$
+is partially decidable.
+\begin{proof}
+If $c_M$~is the partial characteristic function of~$M$, then the partial characteristic function of~$N$ is computed by $c_N(\vec{y})\simeq c_M(g_1(\vec{y}),\ldots,g_n(\vec{y}))$.
+\end{proof}
+
+\section*{Chapter~7}
+\subsection*{Exercises~1.4}
+\exercise{2}
+\begin{enumerate}[itemsep=0pt]
+\item[(a)] Let $B\subseteq\N$ be recursive and $n>1$. Define the predicate
+$$M(x_1,\ldots,x_n)\equiv \prod_{i=1}^n p_i^{x_i}\in B$$
+Then $M$~is decidable.
+\begin{proof}
+The characteristic function is given by $c_M(x_1,\ldots,x_n)=c_B(\prod p_i^{x_i})$, which is computable.
+\end{proof}
+\item[(b)] For $n>1$, call $A\subseteq\N^n$ \emph{recursive} iff the predicate `$\vec{x}\in A$' is decidable. Then $A$~is recursive iff the set $B=\{\,\prod p_i^{x_i}\mid(x_1,\ldots,x_n)\in A\,\}$ is recursive.
+\begin{proof}
+This follows from~(a) since $c_A(\vec{x})=c_M(\vec{x})$.
+\end{proof}
+\end{enumerate}
+\noindent This exercise shows that we experience no loss of generality in restricting attention to recursive subsets of~$\N$, since recursive subsets of more general sets can be fully characterized in~$\N$ using effective codings.
+
+\subsection*{Exercises~2.18}
+\exercise{1}
+For $a,e\in\N$, the set ${}^aW_e=\{\,x\mid\phi_e(x)=a\,\}$ is r.e., and ${}^aW_1,{}^aW_2,\ldots$ is an enumeration of all r.e. sets.
+\begin{proof}
+The set ${}^aW_e$~is r.e. since `$\phi_e(x)\simeq a$' is partially decidable (Theorem~6.6.13).
+
+Now if $A$~is r.e., $A=W_k$ for some~$k$. Define $f(x)=\mathbf{a}(\phi_k(x))$. Then $f$~is computable, so $f=\phi_m$ for some~$m$, and
+$$x\in A\iff x\in W_k\iff x\in W_m\iff\phi_m(x)=a\iff x\in{}^aW_m$$
+Hence $A={}^aW_m$. Since $A$~was arbitrary, this establishes the enumeration.
+\end{proof}
+
+\exercise{2}
+The set $\B=\{\,x\mid\phi_x\text{ is not injective}\,\}$ is r.e.
+\begin{proof}
+The predicate $M(x,y,z)\equiv\phi_x(y)=\phi_x(z)$ is partially decidable, and
+$$x\in\B\iff\exists y\exists z\bigl(\,y\ne z\land M(x,y,z)\,\bigr)$$
+\end{proof}
+
+\exercise{3}
+There exist total computable functions $k$~and~$l$ such that for all~$x$,
+$$W_x=E_{k(x)}\quad\text{and}\quad E_x=W_{l(x)}$$
+\begin{proof}
+We already know $k$~exists by Exercise~5.3.2.2. Define
+$$f(x,y)\simeq\mu z[\,S_1(x,(z)_1,y,(z)_2)\,]_1$$
+By the \smn\ theorem, there exists a total computable function~$l(x)$ such that for all $x$~and~$y$, $\phi_{l(x)}(y)=f(x,y)$. Then $y\in E_x$ iff $y\in W_{l(x)}$, hence $E_x=W_{l(x)}$.
+\end{proof}
+
+\exercise{4}
+If $A$~is r.e., then $\bigunion_{x\in A}W_x$ and $\bigunion_{x\in A}E_x$ are r.e.
+\begin{proof}
+By definition,
+\begin{align*}
+y\in\bigunion_{x\in A}W_x&\iff \exists x(x\in A\land y\in W_x)\\
+y\in\bigunion_{x\in A}E_x&\iff \exists x(x\in A\land y\in E_x)
+\end{align*}
+and the predicates on the right are partially decidable.
+\end{proof}
+
+\exercise{5}
+Let $f$~be a unary computable function and $A\subseteq\dom f$. Then $A$~is r.e. iff $g=f|_A$ is computable.
+\begin{proof}
+If $g$~is computable, then $A=\dom g$ is r.e. by Theorem~2.3. If $A$~is r.e. and $c_A$~is the partial characteristic function of~$A$, then $g(x)=f(x\cdot c_A(x))$ is computable.
+\end{proof}
+
+\exercise{6}
+Let $f$~be a unary function and set $A=\{\,2^x3^{f(x)}\mid x\in\dom f\,\}$. Then $f$~is computable iff $A$~is r.e.
+\begin{proof}
+If $f$~is computable, $\dom f$~is r.e. and hence is empty or enumerated by a total unary computable function~$g$. If empty, $A=\emptyset$ is r.e. If not, define $h(x)=2^{g(x)}3^{f(g(x))}$. Then $h$~is computable and $A=\ran\,h$, so $A$~is r.e.
+
+Conversely, if $B$~is r.e., then `$2^x3^y\in B$' is partially decidable, and $f(x)\simeq y$ iff $2^x3^y\in B$, hence $f$~is computable by Theorem~6.6.13.
+\end{proof}
+
+\exercise{7}
+Let $A$~be infinite and r.e. Then $A$~can be enumerated without repetitions by a total computable function.
+\begin{proof}
+Let $f$~be a total unary computable function with $A=\ran f$. Define
+\begin{align*}
+g(0)&=f(0)\\
+g(n)&=f(\mu t[f(t)\not\in\{f(0),\ldots,f(n-1)\}])\qquad(n>0)
+\end{align*}
+Then $g$~is well-defined, total, and computable, and by construction enumerates~$A$ without repetitions.
+\end{proof}
+
+\exercise{8}
+We consider sets:
+\begin{center}
+\begin{tabular}{|l|c|c|c|}
+\hline
+$A$&$A$\quad r.e.&$\overline{A}$\quad r.e.&$A$\quad recursive\\
+\hline
+$\{x\mid x\in E_x\}$&Y&N&N\\
+$\{x\mid x\text{ a perfect square}\,\}$&Y&Y&Y\\
+$\{x\mid\phi_x\text{ injective}\,\}$&N&Y&N\\
+$\{x\mid\exists\ge x\text{ 7's in }\pi\,\}$&Y&N&N\\
+$\{x\mid P_m(x)\uparrow\,\}$&N&Y&N\\
+\hline
+\end{tabular}
+\end{center}
+
+\exercise{10}
+Let $A$~be recursive, $B$~r.e., and $f$~a total unary computable function. Then $f^{-1}(A)$ is recursive, and $f(A)$, $f(B)$, and $f^{-1}(B)$ are r.e. but not necessarily recursive. If $f$~is bijective on~$\N$, then $f(A)$~is recursive.
+\begin{proof}
+$f^{-1}(B)$~is r.e. since $x\in f^{-1}(B)\iff f(x)\in B$, which is partially decidable since $B$~is r.e. Similarly, $y\in f(B)\iff\exists x(x\in B\land f(x)\simeq y)$, which is also partially decidable, so $f(B)$~is r.e.
+
+It follows that $f(A)$~and~$f^{-1}(A)$ are r.e. since $A$~is r.e., and $\overline{f^{-1}(A)}=f^{-1}(\overline{A})$ is r.e., so $f^{-1}(A)$~is recursive.
+
+Note $f^{-1}(B)$ and $f(B)$ are not necessarily recursive; for example, take $B=K$ and $f$~the identity map. Also $f(A)$~is not necessarily recursive; for example, take $A=\N$ and $f=\phi_k$ where $\phi_k$~is total, injective, and $K=E_k$ (cf. Exercise~7).
+
+These examples show that we do not gain additional information if we assume $f$~is injective. However, if $f$~is bijective on~$\N$, then $y\in f(A)\iff f^{-1}(y)\in A$, which is decidable by Exercise~2.5.4.1, so $f(A)$~is recursive.
+\end{proof}
+
+\exercise[Rice-Shapiro]{11}
+The Rice-Shapiro Theorem implies Rice's Theorem.
+\begin{proof}
+Let $\B\subseteq\C_1$ with $\B\ne\emptyset,\C_1$. We must prove that $\B$~is not recursive using the Rice-Shapiro Theorem.
+
+Fix $f\in\B$ and $g\in\overline{\B}$. Note $\emptyset\subseteq f,g$. If $\B$~is recursive, then $\B$~and~$\overline{\B}$ are both r.e., so by the Rice-Shapiro Theorem, $\emptyset\not\in\B$ since $g\not\in\B$ and $\emptyset\not\in\overline{\B}$ since $f\not\in\overline{\B}$. But this is a contradiction since $\emptyset\in\C_1=\B\union\overline{\B}$. Therefore $\B$~is not recursive.
+\end{proof}
+
+\exercise{13}
+\begin{enumerate}[itemsep=0pt]
+\item[(a)] Define sets $K_0=\{\,x\mid\phi_x(x)=0\,\}$ and $K_1=\{\,x\mid\phi_x(x)=1\,\}$. Then $K_0$~and~$K_1$ are recursively inseperable.
+\begin{proof}
+Trivially $K_0$~and~$K_1$ are r.e. and $K_0\sect K_1=\emptyset$. If $C$~is recursive and $K_0\subseteq C$ and $K_1\subseteq\overline{C}$, note that the characteristic function of~$C$ differs from~$\phi_x$ at~$x$ for all~$x$---a contradiction.
+\end{proof}
+\item[(b)] Let $A$~and~$B$ be disjoint. Then $A$~and~$B$ are recursively inseparable iff whenever $A\subseteq W_a$ and $B\subseteq W_b$ with $W_a\sect W_b=\emptyset$, then there exists $x\not\in W_a\union W_b$.
+\begin{proof}
+If for all~$x$, $x\in W_a\union W_b$, then $W_a,W_b$ partition~$\N$, so $W_b=\overline{W_a}$ and $W_a,W_b$ are recursive. But then $A$~and~$B$ are not recursively inseparable.
+
+Conversely, if $A$~and~$B$ are recursively inseparable, choose $C$~recursive with $A\subseteq C$ and $B\subseteq\overline{C}$. Since $C$~and~$\overline{C}$ are r.e., there exist $a,b\in\N$ with $C=W_a$ and $\overline{C}=W_b$, and hence for all~$x$, $x\in W_a\union W_b$.
+\end{proof}
+\end{enumerate}
+\noindent Note intuitively that $A$~and~$B$ are recursively inseparable iff there does not exist a general effective procedure by which to \emph{rule out}, for an arbitrary~$x$, one or the other of the alternatives $x\in A$ or $x\in B$.
+
+\subsection*{Exercises~3.13}
+\exercise{1}
+The following sets are productive:
+\begin{enumerate}[itemsep=0pt]
+\item[(a)] $\{\,x\mid W_x\text{ is finite}\,\}$
+\item[(b)] $\{\,x\mid\phi_x\text{ is not surjective}\,\}$
+\item[(c)] $\{\,x\mid\phi_x\text{ is injective}\,\}$
+\item[(d)] $\{\,x\mid\phi_x\text{ is not a polynomial}\,\}$
+\end{enumerate}
+\begin{proof}
+By Theorem~3.4. For (a)--(d), the empty function is in the set; for (a), (b), and~(d), the identity function is not in the set; and for~(c), the zero function is not in the set.
+\end{proof}
+
+\exercise{2}
+The following sets are creative:
+\begin{enumerate}[itemsep=0pt]
+\item[(a)] $\{\,x\mid x\in E_x\,\}$
+\item[(b)] $\{\,x\mid E_x^{(n)}\ne\emptyset\,\}$
+\item[(c)] $\{\,x\mid\phi_x\text{ is not injective}\,\}$
+\item[(d)] $\{\,x\mid\phi_x(x)\in B\,\}$ where $B$~is a nonempty r.e. set
+\item[(e)] $\{\,x\mid\phi_x(x)=f(x)\,\}$ where $f$~is a total computable function
+\end{enumerate}
+\begin{proof}
+By Theorem~3.8.
+
+For (a)~and~(b), we know the sets are r.e., and we know the sets are not recursive hence nontrivial and proper.
+
+For~(c), we know the set is r.e. (Exercise~2.18.2), and the zero function is in but the identity function is not.
+
+For~(d), we know the set is r.e. since `$\phi_x(x)\in B$' is partially decidable. Fix $b\in B$. Then the function~$\mathbf{b}$ is in the set, but the empty function is not.
+
+For~(e), we know the set is r.e. since `$\phi_x(x)=f(x)$' is partially decidable, and $f$~is in the set but the empty function is not.
+\end{proof}
+
+\exercise{3}
+Let $A$~and~$B$ be sets and suppose $B$~is r.e. and $A\sect B$~is productive. Then $A$~is productive.
+\begin{proof}
+First we claim there exists a total computable function~$k$ such that for all~$x$, $W_{k(x)}=W_x\sect B$. Indeed, since $B$~is r.e., by the \smn\ theorem there exists~$k$ with
+$$\phi_{k(x)}(y)=\begin{cases}
+\phi_x(y)&\text{if }y\in B\\
+\text{undefined}&\text{otherwise}
+\end{cases}$$
+Then $W_{k(x)}=W_x\sect B$ as desired.
+
+Now let $f$~be a productive function for~$A\sect B$. We claim $g=f\circ k$ is productive for~$A$. Indeed, $g$~is total computable, and given $W_x\subseteq A$, $W_{k(x)}\subseteq A\sect B$, so
+$$g(x)=f(k(x))\in A\sect B-W_{k(x)}=A\sect B-W_x\sect B\subseteq A-W_x$$
+Thus $A$~is productive.
+\end{proof}
+
+\exercise{4}
+Let $A$~and~$C$ be disjoint sets and suppose $A$~is r.e. and $C$~is creative. Then $A\union C$~is creative.
+\begin{proof}
+Since $A$~and~$C$ are r.e., $A\union C$ is r.e.
+
+We claim that $\overline{A\union C}=\overline{A}\sect\overline{C}$ is productive. Fix a total computable function~$k$ such that for all~$x$, $W_{k(x)}=W_x\union A$ (cf.~Exercise~3), and let $f$~be a productive function for~$\overline{C}$. We claim that $g=f\circ k$ is productive for $\overline{A}\sect\overline{C}$. Indeed, $g$~is total computable, and given $W_x\subseteq\overline{A}\sect\overline{C}$, $W_{k(x)}\subseteq\overline{C}$, so
+$$g(x)=f(k(x))\in\overline{C}-W_{k(x)}=\overline{C}-W_x\union A\subseteq\overline{A}\sect\overline{C}-W_x$$
+Thus $\overline{A}\sect\overline{C}$ is productive, and so $A\union C$ is creative.
+\end{proof}
+
+\noindent This exercise shows that adjoining additional r.e. elements to a creative set preserves creativity, while the previous exercise shows that adjoining additional non-r.e. elements to a productive set preserves productivity.
+
+\bigskip
+\exercise{7}
+Let $\B\subseteq\C_1$, and suppose there exists $g\in\B$ such that for all finite $\theta\subseteq g$, $\theta\not\in\B$. Then $\B$~is productive.
+\begin{proof}
+By the \smn\ theorem, there exists~$k$ such that for all~$x$,
+$$\phi_{k(x)}(y)=\begin{cases}
+g(y)&\text{if }\lnot H_1(x,x,y)\\
+\text{undefined}&\text{otherwise}
+\end{cases}$$
+If $x\in\overline{K}$, then $\phi_{k(x)}=g\in\B$, and if $x\not\in\overline{K}$, then $\phi_{k(x)}\subseteq g$ is finite, hence $\phi_{k(x)}\not\in\B$. By Theorem~3.2, $\B$~is productive.
+\end{proof}
+
+\exercise{8}
+The following sets are productive:
+\begin{enumerate}[itemsep=0pt]
+\item[(a)] $\{\,x\mid\phi_x\text{ is total}\,\}$
+\item[(b)] $\{\,x\mid\phi_x\text{ is a polynomial}\,\}$
+\end{enumerate}
+\begin{proof}
+Note the identity function is in both sets, but no finite function is in either set, so the sets are productive by Exercise~7.
+\end{proof}
+
+\exercise{9}
+\begin{enumerate}[itemsep=0pt]
+\item[(a)] The sets $K_0=\{\,x\mid\phi_x(x)=0\,\}$ and $K_1=\{\,x\mid\phi_x(x)=1\,\}$ are effectively recursively inseparable.
+\begin{proof}
+By the \smn\ theorem, there exists a total computable function $k(a,b)$ such that for all $a,b$ with $W_a\sect W_b=\emptyset$,
+$$\phi_{k(a,b)}(x)=\begin{cases}
+1&\text{if }x\in W_a\\
+0&\text{if }x\in W_b\\
+\text{undefined}&\text{otherwise}
+\end{cases}$$
+Now suppose $K_0\subseteq W_a$ and $K_1\subseteq W_b$ with $W_a\sect W_b=\emptyset$. Set $n=k(a,b)$. Then if $n\in W_a\union W_b$, $\phi_n(n)=0$ iff $\phi_n(n)=1$---a contradiction. Hence $n\not\in W_a\union W_b$.
+\end{proof}
+\item[(b)] Suppose $A$~and~$B$ are r.e. sets which are effectively recursively inseparable. Then $A$~and~$B$ are creative.
+\begin{proof}
+We must prove that $\overline{A}$~and~$\overline{B}$ are productive.
+
+To see $\overline{A}$~is productive, fix~$k$ such that for all~$x$, $W_{k(x)}=W_x\union B$ (cf.~Exercise~3) and let $f$~be a witness function for $A$~and~$B$. Define $g(x)=f(a,k(x))$, where $A=W_a$. Then given $W_x\subseteq\overline{A}$, $g(x)\not\in A\union W_{k(x)}=A\union B\union W_x$, so $g(x)\in\overline{A}-W_x$. So $g$~is a productive function or~$\overline{A}$.
+
+To see $\overline{B}$~is productive, proceed similarly.
+\end{proof}
+\end{enumerate}
+
+\subsection*{Exercises~4.4}
+\exercise{2}
+Let $f$~be an injective total computable function such that $\ran f$~is not recursive. Then the set
+$$A=\bigl\{\,x\mid\exists y>x\bigl(\,f(y)<f(x)\,\bigr)\,\bigr\}$$
+is simple.
+\begin{proof}
+Note $A$~is r.e. since membership is partially decidable.
+
+If $\overline{A}$~is finite, then there exists some~$x_0$ such that for all $x\ge x_0$, $x\in A$. But then we can recursively define
+$$x_{n+1}=\mu x>x_n[f(x_{n+1})<f(x_n)]$$
+Now $f(x_0)>f(x_1)>\cdots$ is infinitely descending---a contradiction. Thus $\overline{A}$~is infinite.
+
+To see that $\overline{A}$~contains no infinite r.e. subset, suppose towards a contradiction that $B\subseteq\overline{A}$ is infinite r.e. Then we can decide whether $y\in\ran f$ as follows: search for $b\in B$ with $f(b)>y$ (such a~$b$ much exist since $B$~is infinite and $f$~is injective). Then we know for all $c>b$, $y<f(b)<f(c)$. Now check whether any of $f(0),\ldots,f(b-1)$ equal~$y$. If so, $y\in\ran f$; if not, then by the previous remark, $y\not\in\ran f$. Since $\ran f$~is not decidable, this is a contradiction.
+\end{proof}
+
+\section*{Chapter~9}
+\subsection*{Exercises~1.7}
+\exercise{1}
+\begin{enumerate}[itemsep=0pt]
+\item[(a)] $K\mr\{\,x\mid\phi_x(x)=0\,\}$
+\begin{proof}
+By the \smn\ theorem, there exists a total computable function~$s$ such that for all~$x$,
+$$\phi_{s(x)}(y)=\begin{cases}
+0&\text{if }x\in W_x\\
+\text{undefined}&\text{otherwise}
+\end{cases}$$
+Clearly $x\in W_x$ iff $\phi_{s(x)}(s(x))=0$.
+\end{proof}
+\item[(b)] $K\mr\{\,x\mid x\in E_x\,\}$
+\begin{proof}
+By the \smn\ theorem, there exists a total computable function~$t$ such that for all~$x$,
+$$\phi_{t(x)}(y)=\begin{cases}
+y&\text{if }x\in W_x\\
+\text{undefined}&\text{otherwise}
+\end{cases}$$
+Then $x\in W_x$ iff $t(x)\in E_{t(x)}$.
+\end{proof}
+\end{enumerate}
+
+\exercise{3}
+\begin{enumerate}[itemsep=0pt]
+\item[(a)] $\{\,x\mid \phi_x=\mathbf{0}\,\}\mr\{\,x\mid\phi_x\text{ is total and constant}\,\}$
+\begin{proof}
+By the \smn\ theorem, there exists a total computable function~$k$ such that for all~$x$,
+$$\phi_{k(x)}(y)=y\sum_{z=0}^y\phi_x(z)$$
+If $\phi_x=\mathbf{0}$, then $\phi_{k(x)}=\mathbf{0}$, so $\phi_{k(x)}$~is total and constant. If $\phi_x\ne\mathbf{0}$, then either $\phi_x$~is total or it is not. If $\phi_x$~is not total, then neither is~$\phi_{k(x)}$ (in fact, if $\phi_x(y)$~is undefined, then $\phi_{k(x)}(z)$~is undefined for all $z\ge y$). If $\phi_x$~is total, choose~$y$ such that $\phi_x(y)>0$. Then
+$$\phi_{k(x)}(y+1)=(y+1)\sum_{z=0}^{y+1}\phi_x(z)\ge(y+1)\sum_{z=0}^y\phi_x(z)\ge\phi_{k(x)}(y)+\phi_x(y)>\phi_{k(x)}(y)$$
+Hence $\phi_{k(x)}$~is not constant.
+\end{proof}
+\item[(b)] $\{\,x\mid\phi_x\text{ is total}\,\}\mr\{\,x\mid W_x\text{ is infinite}\,\}$
+\begin{proof}
+Using the same function~$k$ from part~(a).
+\end{proof}
+\end{enumerate}
+
+\exercise{5}
+Suppose $A$~and~$B$ are r.e., $A\union B=\N$ and $A\sect B\ne\emptyset$. Then $A\mr A\sect B$.
+\begin{proof}
+Write $A=W_a$, $B=W_b$, and define $\tau(x)=\mu t[H_1(a,x,t)\lor H_1(b,x,t)]$. Then $\tau$~is total and computable, and hence so is
+$$\pi(x)=\begin{cases}
+0&\text{if }H_1(a,x,\tau(x))\\
+1&\text{otherwise}
+\end{cases}$$
+Note $\pi^{-1}(0)\subseteq A$ and $\pi^{-1}(1)\subseteq B$. Now fix $w\in A\sect B$ and define total computable
+$$f(x)=(1-\pi(x))w+\pi(x)x$$
+If $x\in A$, either $\pi(x)=0$ and $f(x)=w\in A\sect B$, or else $\pi(x)=1$ so $x\in B$ and hence $f(x)=x\in A\sect B$. If $x\not\in A$, then $x\in B$ and $\pi(x)=1$, so $f(x)=x\not\in A\sect B$. Therefore $x\in A$ iff $f(x)\in A\sect B$, so $f:A\mr A\sect B$.
+\end{proof}
+
+\subsection*{Exercises~2.9}
+\exercise{1}
+The following sets are m-equivalent to~$K$:
+\begin{enumerate}[itemsep=0pt]
+\item[(a)] $\{\,x\mid x\in E_x\,\}$
+\item[(b)] $\{\,x\mid\phi_x(x)=0\,\}$
+\end{enumerate}
+\begin{proof}
+These sets are m-reducible to~$K$ since they are r.e. (Theorem~1.6), and $K$~is m-reducible to each of them by Exercise~1.7.1.
+\end{proof}
+
+\exercise{3}
+It is not true in general that if $A\me\overline{A}$, then $A$~is recursive.
+\begin{proof}
+Let $\dg{a}=\dg{0}_m'\union\dg{0}_m'^*>\dg{0}$. Then $\dg{a}=\dg{a}^*$ by Exercise~5(d). Hence for $A\in\dg{a}$, $A$~is not recursive but $A\me\overline{A}$.
+\end{proof}
+
+\exercise{4}
+The following sets are all m-equivalent:
+\begin{enumerate}[itemsep=0pt]
+\item[(a)] $A=\{\,x\mid\phi_x=\mathbf{0}\,\}$
+\item[(b)] $B=\{\,x\mid\phi_x\text{ is total and constant}\,\}$
+\item[(c)] $C=\{\,x\mid W_x\text{ is infinite}\,\}$
+\end{enumerate}
+\begin{proof}
+We know $A\mr B$ by Exercise 1.7.3(a). To see $B\mr C$, note by the \smn\ theorem there exists a total computable function~$s$ such that for all~$x$, $\phi_{s(x)}$~is defined recursively as follows:
+\begin{align*}
+\phi_{s(x)}(0)&=\phi_x(0)\\
+\phi_{s(x)}(y+1)&=\begin{cases}
+\phi_x(y+1)&\text{if }\phi_{s(x)}(y)\text{ is defined and }\phi_x(y+1)=\phi_{s(x)}(y)\\
+\text{undefined}&\text{otherwise}
+\end{cases}
+\end{align*}
+If $\phi_x$~is total and constant, then $\phi_{s(x)}=\phi_x$ so $W_{s(x)}=\N$ is infinite. If $\phi_x$~is not total, then there exists~$y$ such that $\phi_x(y)$~is undefined; by construction then, $\phi_{s(x)}(z)$~is undefined for all $z\ge y$, so $W_{s(x)}$~is finite. If $\phi_x$~is total but not constant, then there exists a least $y>0$ such that $\phi_x(y)\ne\phi_x(0)$; by construction again, $\phi_{s(x)}(z)$~is undefined for all $z\ge y$, so $W_{s(x)}$~is finite. Thus $s:B\mr C$.
+
+Finally, to see $C\mr A$, note by the \smn\ theorem there exists a total computable function~$u$ such that for all~$x$,
+$$\phi_{u(x)}(y)=\mathbf{0}\bigl(\,\mu t\bigl[\biglor_{i=0}^t H_1(x,y+i,t)\bigr]\,\bigr)$$
+If $W_x$~is infinite, then for any~$y$ there exists $z\ge y$ such that $\phi_x(z)$~is defined, that is, for any~$y$ there exists~$i$ and $t\ge i$ such that the computation $P_x(y+i)$ halts within~$t$ steps, so $\phi_{u(x)}(y)=0$. Since $y$~was arbitrary, $\phi_{u(x)}=\mathbf{0}$. Conversely, if $W_x$~is finite, there exists some~$y$ such that for all $z\ge y$, the computation~$P_x(z)$ never halts, so $\phi_{u(x)}(y)$~is undefined and $\phi_{u(x)}\ne\mathbf{0}$. Therefore we have $u:C\mr A$.
+
+Since $A\mr B\mr C\mr A$, $A\me B\me C$ by Theorem~1.3.
+\end{proof}
+
+\exercise{5}
+Let $\dg{a},\dg{b}$ be m-degrees.
+\begin{enumerate}
+\item[(a)] The least upper bound $\dg{a}\lub\dg{b}$ of $\dg{a}$~and~$\dg{b}$ is uniquely determined.
+\begin{proof}
+We have existence by Theorem~2.8. If $\dg{c}$~and~$\dg{d}$ are both least upper bounds, then $\dg{c}\mr\dg{d}$ and $\dg{d}\mr\dg{c}$ by definition, so $\dg{c}=\dg{d}$ by Theorem~2.6.
+\end{proof}
+
+\item[(b)] If $\dg{a}\mr\dg{b}$, then $\dg{a}\lub\dg{b}=\dg{b}$.
+\begin{proof}
+By definition $\dg{b}\mr\dg{a}\lub\dg{b}$. Now $\dg{b}$~is an upper bound of $\dg{a}$~and~$\dg{b}$, hence $\dg{a}\lub\dg{b}\mr\dg{b}$ by definition, so $\dg{a}\lub\dg{b}=\dg{b}$.
+\end{proof}
+
+\item[(c)] If $\dg{a}$~and~$\dg{b}$ are r.e., then so is $\dg{a}\lub\dg{b}$.
+\begin{proof}
+By the proof of Theorem~2.8, since if $A$~and~$B$ are r.e. sets, so is their direct sum.
+\end{proof}
+
+\item[(d)] If $\dg{a}^*$~denotes the m-degree of~$\overline{A}$ for $A\in\dg{a}$, then $(\dg{a}\lub\dg{a}^*)^*=\dg{a}\lub\dg{a}^*$.
+\begin{proof}
+Note $\dg{a}^*$ is well-defined by Theorem~1.3(b).
+
+Write $\dg{b}=\dg{a}\lub\dg{a}^*$, so we must prove $\dg{b}^*=\dg{b}$. We first claim $\dg{b}^*$~is an upper bound for $\dg{a}$~and~$\dg{a}^*$, so that $\dg{b}\mr\dg{b}^*$. Indeed, for $X\in\dg{b}^*$, $\overline{X}\in\dg{b}$ by definition. Thus for $Y\in\dg{a}$, $\overline{Y}\in\dg{a}^*\mr\dg{b}$, so $\overline{Y}\mr\overline{X}$ and $Y\mr X$, and hence $\dg{a}\mr\dg{b}^*$. By symmetry, $\dg{a}^*\mr\dg{b}^*$, establishing our claim.
+
+Now $\dg{b}\mr\dg{b}^*$, so $\dg{b}^*\mr(\dg{b}^*)^*=\dg{b}$ (Theorem~1.3(b)), so $\dg{b}=\dg{b}^*$ as desired.
+\end{proof}
+\end{enumerate}
+
+\exercise{6}
+\begin{enumerate}[itemsep=0pt]
+\item[(a)] Every nontrivial m-degree is denumerable.
+\begin{proof}
+Let $\dg{a}$~be an m-degree with $\dg{a}\ne\dg{o},\dg{n}$. To see that $\dg{a}$~is infinite, fix $A\in\dg{a}$ and consider the sets
+$$A_n=A+n=\{\,a+n\mid a\in A\,\}$$
+Clearly $A_n\in\dg{a}$ for all~$n$, and the $A_n$~are pairwise distinct since if $\lambda$~is least in~$A$, $\lambda+n$ is least in~$A_n$.
+
+To see that $\dg{a}$~is countable, note for every $B\in\dg{a}$ there exists a distinct pair $(f_B,g_B)$ of total computable functions with $f_B:A\mr B$ and $g_B:B\mr A$. Choose such a pair for each $B\in\dg{a}$ and define
+\begin{align*}
+\Phi:\dg{a}&\to\C_1\times\C_1\\
+	B&\mapsto(f_B,g_B)
+\end{align*}
+Then $\Phi$~is injective, and $\C_1\times\C_1$ is countable, so $\dg{a}$~is countable.
+\end{proof}
+
+\item[(b)] There exist uncountably many m-degrees.
+\begin{proof}
+Let $\D$~be the set of $m$-degrees. If $\D$~is countable, then since each of the m-degrees is countable, we have
+$$\P(\N)\subseteq\bigunion_{\dg{a}\in\D}\dg{a}$$
+is countable---a contradiction since $\P(\N)$~is uncountable.
+\end{proof}
+
+\item[(c)] There are only countably many r.e. m-degrees.
+\begin{proof}
+If there are uncountably many r.e. m-degrees, there are uncountably many distinct r.e. sets---a contradiction.
+\end{proof}
+\end{enumerate}
+
+\subsection*{Exercises~4.10}
+\exercise{1}
+If $\chi$~and~$\psi$ are total unary functions and $\phi_e^\chi$~is total, $\phi_e^\psi$~need not be total.
+\begin{proof}
+Let~$e$ be the index of the following URMO program:
+\begin{center}
+\begin{tabular}{rl}
+1.&T(1,2)\\
+2.&O(2)\\
+3.&J(2,3,6)\\
+4.&S(1)\\
+5.&J(1,1,1)
+\end{tabular}
+\end{center}
+Note $P_e$~on input~$x$ searches for the first zero of the oracle function that is~$\ge x$. Hence for $\chi=\mathbf{0}$, $\phi_e^\chi$~is the total identity function, but for $\psi=\mathbf{1}$, $\phi_e^\psi$~is the empty function.
+\end{proof}
+
+\exercise{3}
+Let $\chi_1,\ldots,\chi_k$ be total unary functions and let $\PAR^{\chi_1,\ldots,\chi_k}$ be the class of $\chi_1,\ldots,\chi_k$-partial recursive functions.
+
+Define $\chi(x)=\prod_{i=1}^k p_i^{\chi_i(x)}$. Then $\C^{\chi}=\PAR^{\chi_1,\ldots,\chi_k}$.
+\begin{proof}
+By Theorem~4.5, $\C^\chi=\PAR^\chi$, so it suffices to prove $\PAR^\chi=\PAR^{\chi_1,\ldots,\chi_k}$. By definition of~$\chi$, it is immediate that $\chi\in\PAR^{\chi_1,\ldots,\chi_k}$, hence $\PAR^\chi\subseteq\PAR^{\chi_1,\ldots,\chi_k}$. Conversely, note
+$$\chi_i(x)=(\chi(x))_i\quad(1\le i\le k)$$
+Hence $\chi_i\in\PAR^\chi$ for $1\le i\le k$, so $\PAR^{\chi_1,\ldots,\chi_k}\subseteq\PAR^\chi$.
+\end{proof}
+\noindent This exercise shows that we can fully characterize partial recursiveness relative to multiple oracles in terms of our existing notion of computability relative to a single oracle. We could also define directly a notion of computability relative to multiple oracles, but we would gain nothing by doing so, as this exercise illustrates.
+
+\bigskip
+\exercise{3}
+If $\chi$~is computable, then $\C=\C^\chi$.
+\begin{proof}
+Since the URMO extends the URM, $\C\subseteq\C^\chi$.
+
+To prove $\C^\chi\subseteq\C$, we must show that for any URMO program~$P$, there exists a URM program~$P^*$ such that $P^*$ URM-computes the same functions that $P^\chi$ URMO-computes, that is, so that $f_{P^*}^{(n)}=f_{P^\chi}^{(n)}$ for all~$n$. We sketch a construction.
+
+Let $P$~be a URMO program. Let $Q$~be a URM program computing~$\chi$. Set $p=\rho(P)$, $q=\rho(Q)$, and $m=\max(p,q)$. Now construct a URM program~$P^*$ from~$P$ by replacing every instance of the oracle instruction~O(n) in~$P$ by a sequence of URM instructions performing the following (and then adjusting jump instructions appropriately):
+\begin{enumerate}[itemsep=0pt]
+\item Transfer the contents of $R_1,\ldots,R_q$ to $R_{m+1},\ldots,R_{m+q}$
+\item Transfer the contents of~$R_n$ to~$R_1$
+\item Zero $R_2,\ldots,R_q$
+\item Run~$Q$
+\item Transfer the contents of~$R_1$ to~$R_n$
+\item Transfer the contents of $R_{m+1},\ldots,R_{m+(n-1)},R_{m+(n+1)},\ldots,R_{m+q}$\\
+to $R_1,\ldots,R_{n-1},R_{n+1},\ldots,R_q$
+\end{enumerate}
+Among registers $R_1,\ldots,R_p$, this sequence effects the same configuration change on the URM as the oracle instruction~O(n) does on the URMO when $1\le n\le p$ and $\chi$~is in the oracle. Therefore, since these are the only registers referenced by~$P$, the program~$P^*$ computes the same functions as~$P^\chi$.
+\end{proof}
+
+\exercise{6}
+Let $A$~be a set.
+\begin{enumerate}[itemsep=0pt]
+\item[(a)] If $B$~is r.e., then $B=W_e^A$ for some~$e$.\\
+\emph{Proof:} $B=W_k$ for some~$k$. Let $e$~code~$P_k$ as a URMO program. Then $B=W_e^A$.
+
+\item[(b)] If $A$~is recursive, then $W_e^A$~is r.e. for all~$e$.\\
+\emph{Proof:} By Theorem~4.3(c).
+
+\item[(c)] If $A$~is recursive, $K^A$~is r.e. but not recursive.\\
+\emph{Proof:} By Theorem~4.3(c) and Theorem~4.9(c).
+\end{enumerate}
+
+\exercise{7}
+Let $A,B,C$ be sets.
+\begin{enumerate}[itemsep=0pt]
+\item[(a)] If $A$~is $B$-recursive and $B$~is $C$-recursive, then $A$~is $C$-recursive.\\
+\emph{Proof:} By Theorem~4.3, $c_A\in\C^A\subseteq\C^B\subseteq\C^C$.
+
+\item[(b)] If $A$~is $B$-r.e. and $B$~is $C$-recursive, then $A$~is $C$-r.e.\\
+\emph{Proof:} By Theorem~4.3, $c_A^*\in\C^B\subseteq\C^C$.
+
+\item[(c)] If $A$~is $B$-recursive and $B$~is $C$-r.e., $A$~need not be $C$-r.e.\\
+\emph{Proof:} Set $A=\overline{K}$, $B=K$, and $C=\emptyset$.
+\end{enumerate}
+
+\exercise[Relativized completeness]{8}
+For sets $A$~and~$B$, $B$~is $A$-r.e. iff $B\mr K^A$.
+\begin{proof}
+If $B\mr K^A$, then $B$~is $A$-r.e. since $K^A$~is $A$-r.e.
+
+If $B$~is $A$-r.e., by the relativized \smn\ theorem there exists a total computable function~$k(x)$ such that for all~$x$, $\phi_{k(x)}^A(y)=c_B^*(x)$. If $x\in B$, $\phi_{k(x)}^A=\mathbf{1}$, so $k(x)\in K^A$; and if $x\not\in B$, $\phi_{k(x)}^A=\emptyset$, so $k(x)\not\in K^A$. Thus $k:B\mr K^A$.
+\end{proof}
+
+\exercise{9}
+There exists~$k$ such that $K^A=W_k^A$ for all~$A$.
+\begin{proof}
+By the remark following Theorem~4.7. Let $Q$~be the universal program for unary URMO-computable functions (independent of the oracle), and let~$k$ be the index of a program computing $Q(x,x)$. Then for any~$A$, $K^A=W_k^A$.
+\end{proof}
+
+\begin{rmk}
+Comparing Exercises 1~and~9, we see that with relative computability some results are independent of the oracle chosen while other results are not. Generally speaking, results fundamentally about \emph{programs} (including the relativized \smn\ theorem and existence of universal programs) will be independent of the oracle, while results fundamentally about \emph{functions} will not be. This may be viewed as a difference between \emph{intensional} and \emph{extensional} properties of programs.
+\end{rmk}
+
+\subsection*{Exercises~5.21}
+\exercise{1}
+The following sets are T-complete:
+\begin{enumerate}[itemsep=0pt]
+\item[(a)] $\{\,x\mid x\in E_x\,\}$
+\item[(b)] $\{\,x\mid W_x\ne\emptyset\,\}$
+\end{enumerate}
+\begin{proof}
+Both of these sets are m-complete, hence T-complete by Theorem~5.2(c).
+\end{proof}
+
+\exercise{3}
+There exists a total computable function~$f$ such that for all $A$~and~$B$, if $c_A=\phi_e^B$ then $\phi_{f(e)}:K^A\mr K^B$.
+\begin{proof}
+Let $k$~be the index of the universal program for unary URMO-computable functions (see the remark following Theorem~4.7). Let $\sigma(e)$~be the total computable function which performs the following steps:
+\begin{enumerate}[itemsep=0pt]
+\item Decodes~$k$ to obtain~$P_k$
+\item Decodes~$e$ to obtain~$P_e$
+\item Replaces each oracle instruction in~$P_k$ with a `subroutine call' to~$P_e$ (cf. the proof of Exercise~4.10.3).
+\item Encodes the resulting program and returns the code.
+\end{enumerate}
+Then clearly if $c_A=\phi_e^B$, $\phi_{\sigma(e)}^B(x,y)=\psi_U^A(x,y)$. Now define
+$$\tau(e,x,y)=\phi_{\sigma(e)}^B(x,x)$$
+Clearly $\tau$~is $B$-computable. Hence by the relativized \smn\ theorem (applied twice), there exists a total computable function~$f$ such that for all~$e$, if $n=\phi_{f(e)}(x)$, then $\phi_n^B(y)=\phi_{\sigma(e)}^B(x,x)$ for all~$y$. Thus $n\in K^B$ iff $x\in K^A$, so $\phi_{f(e)}:K^A\mr K^B$.
+\end{proof}
+
+\exercise{4}
+Let $A$~be a set. Define the following sequence:
+\begin{align*}
+A^{(0)}&=A\\
+A^{(n)}&=K^{A^{(n-1)}}\ (n>0)\\
+A^{(\omega)}&=\{\,\pi(m,n)\mid m\in A^{(n)}\,\}
+\end{align*}
+\begin{enumerate}[itemsep=0pt]
+\item[(a)] $A^{(n)}\tR A^{(\omega)}$ for all~$n$.
+\begin{proof}
+Notice $A^{(n)}\mr A^{(\omega)}$ since $x\in A^{(n)}$ iff $\pi(x,n)\in A^{(\omega)}$; hence $A^{(n)}\tr A^{(\omega)}$. If $A^{(\omega)}\tr A^{(n)}$, then in particular
+$$K^{A^{(n)}}=A^{(n+1)}\tr A^{(\omega)}\tr A^{(n)}\tr K^{A^{(n)}}$$
+So $K^{A^{(n)}}\te A^{(n)}$---contradicting Theorem~4.9(c). Therefore $A^{(n)}\tR A^{(\omega)}$.
+\end{proof}
+\item[(b)] There exists a total computable function~$h$ such that $c_{A^{(n)}}=\phi_{h(n)}^{A^{(\omega)}}$ for all~$n$.
+\begin{proof}
+Define $C(n,x)=c_{A^{(\omega)}}(\pi(x,n))$. Then $C$~is $c_{A^{(\omega)}}$-computable and for all $n,x$, $C(n,x)=c_{A^{(n)}}(x)$. Thus by the relativized \smn\ theorem applied to~$C$ there exists a total computable function~$h$ such that $\phi_{h(n)}^{A^{(\omega)}}=c_{A^{(n)}}$ for all~$n$.
+\end{proof}
+\item[(c)] Suppose $B$~is a set and $f$~is a total computable function such that $c_{A^{(n)}}=\phi_{f(n)}^B$ for all~$n$. Then $A^{(\omega)}\tr B$.
+\begin{proof}
+Note $c_{A^{(\omega)}}(x)=c_{A^{(\pi_2(x))}}(\pi_1(x))=\phi_{f(\pi_2(x))}^B(\pi_1(x))$.
+\end{proof}
+\item[(d)] If $A\tr B$, then $A^{(n)}\tr B^{(n)}$ for all~$n$ and $A^{(\omega)}\tr B^{(\omega)}$.
+\begin{proof}
+By assumption $A^{(0)}=A\tr B=B^{(0)}$, and if $A^{(n)}\tr B^{(n)}$, by Theorem~5.7(d)
+$$A^{(n+1)}=K^{A^{(n)}}\tr K^{B^{(n)}}=B^{(n+1)}$$
+Therefore by induction the result holds for all~$n$.
+
+To prove $A^{(\omega)}\tr B^{(\omega)}$, we appeal to the fact that $A^{(n)}\tr B^{(n)}\tr B^{(\omega)}$ and $A^{(\omega)}$~is simplest among the sets harder than all the~$A^{(n)}$ (part~(c)). To formalize this argument, we must make things effective.
+
+Fix~$e$ with $c_A=\phi_e^B$, let $f$~be as in Exercise~3, and let $h$~be as in part~(b) for~$B^{(\omega)}$. Consider
+$$\tau(n,e,x)=\phi_{h(n)}^{B^{(\omega)}}(\phi_{f(e)}(x))$$
+Clearly $\tau$~is $B^{(\omega)}$-computable, so by the relativized \smn\ theorem, there exists a total computable function~$\theta(n,e)$ such that $\phi_{\theta(n,e)}^{B^{(\omega)}}=\phi_{h(n)}^{B^{(\omega)}}\circ\phi_{f(e)}$ for all $n,e$. Now recursively define a total computable function~$g(n)$ as follows:
+\begin{align*}
+g(0)&=e\\
+g(n+1)&=\theta(n+1,g(n))
+\end{align*}
+By induction, $\phi_{g(n)}^{B^{(\omega)}}=c_{A^{(n)}}$ for all~$n$, so $A^{(\omega)}\tr B^{(\omega)}$ by part~(c).
+\end{proof}
+\end{enumerate}
+
+\section*{Chapter~10}
+\noindent In the following exercises, we say that an operator~$\Phi$ is \emph{finitely recursive} if it satisfies condition~(b) of Theorem~1.5.
+
+\subsection*{Exercises~1.7}
+\exercise{2}
+Let $\Phi$~be a recursive operator. Then if $f$~is computable, so is~$\Phi(f)$.
+\begin{proof}
+Let $\phi$~witness recursiveness of~$\Phi$. By definition, for all $\vec{x}$~and~$y$,
+$$\Phi(f)(\vec{x})\simeq y\iff\exists\theta[\theta\subseteq f\land\phi(\code{\theta},\vec{x})\simeq y]$$
+Since $f$~is computable, the predicate on the right is partially decidable, therefore $\Phi(f)(\vec{x})\simeq y$ is partially decidable and $\Phi(f)$~is computable.
+\end{proof}
+\noindent This exercise shows that recursive operators preserve computability.
+
+\bigskip
+\exercise{3}
+For each of the operators below, we determine whether it is monotone, continuous, or recursive.
+\begin{enumerate}[itemsep=0pt]
+\item[(a)] $\Phi(f)(x)\simeq\begin{cases}f(x)&\text{if }\dom f\text{ is finite}\\\text{undefined}&\text{if }\dom f\text{ is infinite}\end{cases}$
+
+$\Phi$~is not monotone. Indeed, consider functions $f(x)\simeq\begin{cases}0&\text{ if}x=0\\\text{undefined}&\text{if }x\ne0\end{cases}$ and $g(x)=x$. Then $f\subseteq g$, but $\Phi(f)=f\not\subseteq f_{\emptyset}=\Phi(g)$. By Theorem~1.4, $\Phi$~is also neither continuous nor recursive.
+
+\item[(b)] $\Phi(f)(x)\simeq\begin{cases}0&\text{if }f(x)\text{ is defined}\\\text{undefined}&\text{otherwise}\end{cases}$
+
+$\Phi$~is clearly continuous (and monotone) since $\Phi(f)(x)\simeq 0$ iff there exists $\theta\subseteq f$ with $\Phi(\theta)(x)\simeq 0$ (for the forward direction, take any $\theta\subseteq f$ with $x\in\dom\,\theta$). $\Phi$~is also finitely recursive since
+$$\phi(\code{\theta},x)\simeq\begin{cases}
+0&\text{if }\theta(x)\text{ is defined}\\
+\text{undefined}&\text{ otherwise}
+\end{cases}$$
+is computable. Therefore $\Phi$~is recursive by Theorem~1.5.
+
+\item[(c)] $\Phi(f)(x)\simeq\begin{cases}0&\text{if }f(x)\simeq n\in K\\1&\text{if }f(x)\simeq n\not\in K\\\text{undefined}&\text{if }f(x)\text{ is undefined}\end{cases}$
+
+$\Phi$~is clearly continuous (and monotone), but $\Phi$~is not recursive by the halting problem. Indeed, if $\phi$~witnesses recursiveness of~$\Phi$, then
+$$c_K(x)=\sic(\phi(3^{x+1},0))$$
+is a computable characteristic function for~$K$---a contradiction.
+
+\item[(d)] $\Phi(f)(x)\simeq\begin{cases}\text{undefined}&\text{if }\dom f\text{ is finite}\\f(x)&\text{if }\dom f\text{ is infinite}\end{cases}$
+
+$\Phi$~is monotone since if $f\subseteq g$, then either $f$~is finite and $\Phi(f)=f_{\emptyset}\subseteq\Phi(g)$, or else $f$~is infinite and hence $g$~is also infinite, so $\Phi(f)=f\subseteq g=\Phi(g)$. $\Phi$~is clearly not continuous, and hence also not recursive.
+\end{enumerate}
+
+\exercise{4}
+Let $\Phi:\F_m\to\F_n$ and $\Psi:\F_n\to\F_q$ be recursive operators. Then the composite $\Psi\circ\Phi:\F_m\to\F_q$ is also recursive.
+\begin{proof}
+Write $\Pi=\Psi\circ\Phi$. Since $\Phi$~and~$\Psi$ are continuous, $\Pi$~is continuous (Exercise~7). We claim $\Pi$~is also finitely recursive, so $\Pi$~is recursive by Theorem~1.5.
+
+Indeed, let $\phi$~and~$\psi$ witness finite recursiveness of $\Phi$~and~$\Psi$, respectively, and define the function
+$$\pi(z,\vec{x})=\begin{cases}
+\Pi(\theta)(\vec{x})&\text{if }z=\code{\theta}\text{ for }\theta\in\F_m\\
+\text{undefined}&\text{ otherwise}
+\end{cases}$$
+Then $\pi$~is computable since
+\begin{align*}
+\pi(z,\vec{x})\simeq y&\iff \exists\theta\bigl[z=\code{\theta}\land \Pi(\theta)(\vec{x})\simeq y\bigr]\\
+	&\iff \exists\theta\bigl[z=\code{\theta}\land \Psi(\Phi(\theta))(\vec{x})\simeq y\bigr]\\
+	&\iff \exists\theta\bigl[z=\code{\theta}\land \exists\theta'[\theta'\subseteq\Phi(\theta)\land\Psi(\theta')(\vec{x})\simeq y]\bigr]\\
+	&\iff \exists\theta\bigl[z=\code{\theta}\land \exists\theta'[\forall\vec{w}\in\dom\,\theta'[\theta'(\vec{w})\simeq\phi(\code{\theta},\vec{w})]\land\psi(\code{\theta'},\vec{x})\simeq y]\bigr]
+\end{align*}
+and the predicate on the right is partially decidable. Therefore $\pi$~witnesses the finite recursiveness of~$\Pi$, so $\Pi$~is recursive as desired.
+\end{proof}
+\noindent This exercise shows the class of recursive operators is closed under composition.
+
+\bigskip
+\exercise{7} Let $\Phi:\F_m\to\F_n$ and $\Psi:\F_n\to\F_q$ be continuous operators. Then the composite $\Psi\circ\Phi:\F_m\to\F_q$ is also continuous.
+\begin{proof}
+Write $\Pi=\Psi\circ\Phi$. Then
+\begin{align*}
+\Pi(f)(\vec{x})\simeq y&\iff\Psi(\Phi(f))(\vec{x})\simeq y&&\\
+	&\iff \exists\theta\subseteq\Phi(f)[\Psi(\theta)(\vec{x})\simeq y]&&\text{by continuity of }\Psi\\
+	&\iff \exists\theta'\subseteq f\bigl[\exists\theta\subseteq\Phi(\theta')[\Psi(\theta)(\vec{x})\simeq y]\bigr]&&\text{by continuity of }\Phi\\
+	&\iff \exists\theta'\subseteq f[\Psi(\Phi(\theta'))(\vec{x})\simeq y]&&\text{by continuity of }\Psi\\
+	&\iff \exists\theta'\subseteq f[\Pi(\theta')(\vec{x})\simeq y]&&
+\end{align*}
+Therefore $\Pi$~is continuous.
+\end{proof}
+\noindent This exercise shows the class of continuous operators is closed under composition.
+
+\bigskip
+\exercise[Enumeration operators]{8}
+We extend the notion of recursiveness to operators on sets of natural numbers.
+\begin{defn}
+Let $\Phi:\P(\N)\to\P(\N)$ be an operator on sets of natural numbers. Then $\Phi$~is \emph{recursive} if the operator $\Phi^*:\F_1\to\F_1$ mapping $c_A^*\to c_{\Phi(A)}^*$ for $A\subseteq\N$ (where $c_A^*$~denotes the partial characteristic function of~$A$, and $\Phi^*$~maps all other functions to~$f_{\emptyset}$, say) is recursive on partial characteristic functions.
+\end{defn}
+\noindent Note by this definition, if $\Phi:\P(\N)\to\P(\N)$ is recursive there exists a computable function $\phi^*(z,x)$ such that for all $A\subseteq\N$,
+$$x\in\Phi(A)\iff\text{there exists finite }X\subseteq A\text{ such that }\phi^*(\code{c_X^*},x)\simeq 1$$
+We can just think of $\code{c_X^*}$~as a coding of~$X$.
+\begin{defn}
+Let $\Phi:\P(\N)\to\P(\N)$.
+\begin{enumerate}[itemsep=0pt]
+\item[(a)] $\Phi$~is \emph{continuous} if for all $A\subseteq\N$ and $x\in\N$, $x\in\Phi(A)$ iff there exists finite $X\subseteq A$ such that $x\in\Phi(X)$.
+\item[(b)] $\Phi$~is \emph{monotone} if for all $A\subseteq B\subseteq\N$, $\Phi(A)\subseteq\Phi(B)$.
+\end{enumerate}
+\end{defn}
+
+\begin{thm}
+Recursive operators are continuous and monotone.
+\end{thm}
+\begin{proof}
+Let $\Phi:\P(\N)\to\P(\N)$ be recursive, and let $\phi^*$~be a witness as above.
+
+To prove continuity, fix $A\subseteq\N$. If $x\in\Phi(A)$, then there exists finite $X\subseteq A$ such that $\phi^*(\code{c_X^*},x)\simeq 1$. Since $X\subseteq X$, this implies $x\in\Phi(X)$. Conversely, if there exists finite $X\subseteq A$ with $x\in\Phi(X)$, then there exists $W\subseteq X$ such that $\phi^*(\code{c_W^*},x)\simeq 1$. But since $W\subseteq A$ is also finite, this implies $x\in\Phi(A)$.
+
+To prove monotonicity, fix $A\subseteq B\subseteq\N$. If $x\in\Phi(A)$, by continuity choose finite $X\subseteq A$ with $x\in\Phi(X)$. Then $X$~is also a finite subset of~$B$, so by continuity again $x\in\Phi(B)$. Therefore $\Phi(A)\subseteq\Phi(B)$.
+\end{proof}
+
+\begin{thm}
+Let $\Phi:\P(\N)\to\P(\N)$. Then $\Phi$~is recursive iff (a)~$\Phi$~is continuous and (b)~there exists a computable function $\phi^*(z,x)$ such that for all finite $X\subseteq\N$ and $x\in\N$, $c_{\Phi(X)}^*(x)\simeq\phi^*(\code{c_X^*},x)$.
+\end{thm}
+\begin{proof}
+Suppose $\Phi$~is recursive. Then (a)~holds since $\Phi$~is continuous by the previous theorem. Let $\phi^{**}$~be a witness function as above and define
+$$\phi^*(z,x)=\begin{cases}
+c_{\Phi(X)}^*(x)&\text{if }z=\code{c_X^*}\text{ for some finite }X\subseteq\N\\
+\text{undefined}&\text{otherwise}
+\end{cases}$$
+Then $\phi^*$~is computable since
+$$\phi^*(z,x)\simeq y\iff\exists X[z=\code{c_X^*}\land\exists Y[Y\subseteq X\land\phi^{**}(\code{c_{Y}^*},x)\simeq 1]]$$
+and the predicate on the right is partially decidable, so $\phi^*$~satisfies~(b).
+
+Conversely, suppose (a)~and~(b) hold. We claim $\phi^*$~witnesses recursiveness of~$\Phi^*$ on partial characteristic functions. Indeed, note
+\begin{align*}
+\Phi^*(c_A^*)(x)\simeq c_{\Phi(A)}^*(x)\simeq 1&\iff x\in\Phi(A)&&\text{by definition of }\Phi^*\\
+	&\iff \exists\text{ finite }X\subseteq A[x\in\Phi(X)]&&\text{by continuity of }\Phi\\
+	&\iff \exists\text{ finite }X\subseteq A[c_{\Phi(X)}^*(x)\simeq 1]&&\\
+	&\iff \exists\text{ finite }X\subseteq A[\phi^*(\code{c_X^*},x)\simeq 1]&&\text{by (b)}\\
+	&\iff \exists \theta\subseteq c_A^*[\phi^*(\code{\theta},x)\simeq 1]
+\end{align*}
+Thus $\Phi^*$~is recursive, so $\Phi$~is recursive.
+\end{proof}
+
+\subsection*{Exercises~2.6}
+\exercise{1}
+Let $\Phi:\F_m\to\F_n$ and $\Psi:\F_n\to\F_q$ be recursive operators. Then the composite $\Psi\circ\Phi:\F_m\to\F_q$ is also recursive.
+\begin{proof}
+We give an alternate proof using Myhill-Shepherdson (cf.~Exercise~1.7.4).
+
+Fix total computable $j,k$ such that $\Phi(\phi_e)=\phi_{j(e)}$ and $\Psi(\phi_e)=\phi_{k(e)}$ for all~$e$. Then
+$$\Psi\circ\Phi(\phi_e)=\Psi(\Phi(\phi_e))=\Psi(\phi_{j(e)})=\phi_{k(j(e))}=\phi_{k\circ j(e)}$$
+Now $\Psi\circ\Phi$~is continuous since $\Phi$~and~$\Psi$ are continuous (Exercise~1.7.7), hence $\Psi\circ\Phi$~is the unique continuous operator satisfying this equation, and is also recursive.
+\end{proof}
+
+\subsection*{Exercises~3.4}
+\exercise{2}
+Consider the recursive operator
+$$\Phi(f)(x)=\begin{cases}
+f(f(x+11))&x\le 100\\
+x-10&x>100
+\end{cases}$$
+Then the only fixed point of~$\Phi$ is $m(x)=\begin{cases}91&x\le 100\\x-10&x>100\end{cases}$.
+\begin{proof}
+It is immediate that $\Phi(m)=m$ since for $x\le 100$, $91\le m(x+11)\le 101$, so $m(m(x+11))=91=m(x)$.
+
+Suppose $\Phi(g)=g$, so $g(x)=g(g(x+11))$ for $x\le 100$ and $g(x)=x-10$ for $x>100$. We claim $g=m$. First note $g(100-y)=91$ for $y\le 100$ by induction on~$y$. Indeed, $g(100)=g(g(100+11))=g(101)=91$. If $0<y\le 10$ and the result holds for $y-1$, then
+$$g(100-y)=g(g(100-y+11))=g(100-(y-1))=91$$
+In particular $g(91)=91$. Finally, if $10<y\le 100$ and the result holds for $z<y$,
+$$g(100-y)=g(g(100-(y-11)))=g(91)=91$$
+By induction then, $g(x)=91=m(x)$ for all $x\le 100$. Since $g(x)=x-10=m(x)$ for all $x>100$, $g=m$ as claimed.
+
+Therefore $m$~is the only fixed point of~$\Phi$.
+\end{proof}
+
+\section*{Chapter~11}
+\subsection*{Exercises~1.10}
+\exercise{1}
+There exists~$n$ such that $\phi_n(x)=\floor{\sqrt[n]{x}}$.
+\begin{proof}
+The function $f(e,x)=\floor{\sqrt[e]{x}}$ is computable, so by the \smn\ theorem there is a total computable function~$s(e)$ such that $\phi_{s(e)}(x)=f(e,x)$ for all~$x$. By the second recursion theorem then, there is~$n$ with $\phi_n(x)=\phi_{s(n)}(x)=f(n,x)=\floor{\sqrt[n]{x}}$ for all~$x$.
+\end{proof}
+
+\exercise{5}
+Let $\A\subseteq\C_1$ and $A=\{\,x\mid\phi_x\in\A\,\}$. Then $A\not\mr\overline{A}$.
+\begin{proof}
+Suppose $f:A\mr\overline{A}$. Then for all $x$, $x\in A\iff f(x)\not\in A$. But by the second recursion theorem, there exists~$n$ with $\phi_n=\phi_{f(n)}$, so
+$$n\in A\iff f(n)\in A\iff n\not\in A$$
+---a contradiction. Therefore $A\not\mr\overline{A}$.
+\end{proof}
+\noindent Note if $\emptyset\subset A\subset\N$, then $A$~cannot be recursive lest $A\me\overline{A}$ (Theorem~9.1.3). This is just Rice's Theorem (Theorem~1.6).
+
+\bigskip
+\exercise{6}
+There exists a total computable function~$f$ such that
+\begin{enumerate}[itemsep=0pt]
+\item[(i)] if $\phi_n$~is total, then $\phi_{f(n)}$~is total
+\item[(ii)] there is no fixed point~$n$ for~$f$ with $\phi_n$~total
+\end{enumerate}
+\begin{proof}
+By the \smn\ theorem, there exists a total computable function~$f$ with
+$$\phi_{f(n)}(x)\simeq \phi_n(x)+1$$
+Clearly if $\phi_n$~is total, then so is~$\phi_{f(n)}$, and in this case $\phi_n\ne\phi_{f(n)}$.
+\end{proof}
+\noindent Note $f_{\emptyset}$~is the least fixed point of the operation used in the proof.
+
+\bigskip
+\exercise[Recursion theorem]{7}
+If $f$~is a total computable function, for any $k\ge1$ there exists~$n$ with $\phi_{f(n)}^{(k)}=\phi_n^{(k)}$.
+\begin{proof}
+Proceed identically to the proof for case $k=1$ (Theorem~1.1), except using the $k$-ary \smn\ theorem with a $k$-ary universal function.
+\end{proof}
+
+\exercise[Recursion theorem]{8}
+If $f$~is a total computable function, there exists an increasing total computable function~$n(t)$ such that for all~$t$, $\phi_{f(n(t))}=\phi_{n(t)}$.
+\begin{proof}
+We first require a lemma:
+\begin{lem}
+There exists a total computable function~$\alpha(e,k)$ such that for all $e$~and~$k$, $\phi_{\alpha(e,k)}=\phi_e$ and $\alpha(e,k)\ge k$.
+\end{lem}
+\begin{proof}
+We give an informal algorithm for~$\alpha$ and appeal to Church's Thesis.
+
+Given $e$~and~$k$, let $r=\rho(P_e)+1$ and let $P_e^n$~denote the program obtained from~$P_e$ by appending $n$~instructions Z($r$). Calculate $e_n=\gamma(P_e^n)$ for $1\le n\le k$. By injectivity of program coding, the set $\{e_0,e_1,\ldots,e_k\}$ has cardinality $k+1$, so there must exist~$e_i$ with $e_i\ge k$. Let $\alpha(e,k)$~be the least such~$e_i$. By construction, $\phi_{\alpha(e,k)}=\phi_e$.
+\end{proof}
+
+\noindent We now claim that there exists a total computable function~$\psi(e,k)$ such that if $\phi_e$~is total, $\psi(e,k)$~is a fixed point for~$\phi_e$ and $\psi(e,k)\ge k$. Indeed, first define
+$$S(e,x,y)\simeq\phi_{\phi_e(\alpha(\phi_x(x),x))}(y)$$
+(where the expression at right is undefined if the index is undefined). Then by the \smn\ theorem (applied twice), there exists a total computable function~$\sigma(e)$ such that for all~$e$, $\phi_{\sigma(e)}$~is total and for all~$x$~and~$y$,
+$$\phi_{\phi_{\sigma(e)}(x)}(y)\simeq\phi_{\phi_e(\alpha(\phi_x(x),x))}(y)$$
+Now define $\sigma^*(e,k)=\alpha(\sigma(e),k)$ and $\psi(e,k)=\alpha(\phi_{\sigma^*(e,k)}(\sigma^*(e,k)),\sigma^*(e,k))$. We verify $\psi$~has the desired properties. Note $\psi$~is total and computable. Now let $\phi_e$~be total, and set $s=\sigma^*(e,k)$ and $n=\psi(e,k)$. Then $n\ge s\ge k$, and substituting into the identity above we obtain
+$$\phi_{\phi_e(n)}=\phi_{\phi_e(\alpha(\phi_s(s),s))}=\phi_{\phi_s(s)}=\phi_{\alpha(\phi_s(s),s)}=\phi_n$$
+Therefore $n$~is a fixed point for~$\phi_e$ and $n\ge k$, establishing our claim.
+
+Finally, define~$n(t)$ recursively by writing $f=\phi_e$ and setting
+\begin{align*}
+n(0)&=\psi(e,0)\\
+n(t+1)&=\psi(e,n(t)+1)
+\end{align*}
+Clearly $n$~is an increasing total computable function whose values are fixed points for~$f$, as required.
+\end{proof}
+\noindent Note the idea behind this proof is best understood relative to the discussion in the book on pp.~207--9. To find~$\psi(e,k)$, we first use~$\alpha$ to reindex the functions on the diagonal enumeration~$\mathbf{D}$ so that the indices are kept suitably large along~$\mathbf{D}$. We then use~$\alpha$ again to find a suitably large index for the $\phi_e$-transformed enumeration~$\mathbf{D}^*$. The fixed point obtained using this index is guaranteed to be~$\ge k$.
+
+\subsection*{Exercises~3.4}
+\exercise[Recursion theorem]{1}
+For all $k\ge 0$, there exists a $(k+1)$-ary total computable function $n(e,\vec{z})$ such that for all~$\vec{z}$, if $\phi_e^{(k+1)}(x,\vec{z})$ is total, then $n(e,\vec{z})$~is a fixed point for~$\phi_e^{(k+1)}$, that is,
+$$\phi_{\phi_e^{(k+1)}(n(e,\vec{z}),\vec{z})}=\phi_{n(e,\vec{z})}$$
+\begin{proof}
+Fix $k\ge0$ and define
+$$f(x,e,\vec{z})\simeq\phi_e^{(k+1)}(x,\vec{z})$$
+Then $f$~is computable (though not total), so by the proof of the second recursion theorem (Theorem~3.1), there exists a total computable function $n(e,\vec{z})$ such that if $f(n(e,\vec{z}),e,\vec{z})$ is defined, then $n(e,\vec{z})$~is a fixed point for~$f$ relative to $e,\vec{z}$.
+
+Now fix $e$~and~$\vec{z}$ and suppose $\phi_e^{(k+1)}(x,\vec{z})$ is total. Then $f(x,e,\vec{z})$ is total, so $n(e,\vec{z})$~is a fixed point for~$f$, that is
+$$\phi_{n(e,\vec{z})}=\phi_{f(n(e,\vec{z}),\vec{z})}=\phi_{\phi_e^{(k+1)}(n(e,\vec{z}),\vec{z})}$$
+But this just means $n(e,\vec{z})$ is a fixed point for $\phi_e^{(k+1)}$, as desired.
+\end{proof}
+
+\section*{Chapter~12}
+\subsection*{Exercises~1.8}
+\exercise{1}
+Let $f$~be a total computable function taking only values in $\{0,1\}$. For all~$m$, there exists a program~$F$ computing~$f$ such that $t_F(x)\le 2x+3$ for all $x\le m$.
+
+In particular, if $b$~is total computable and $b(x)>2x+3$ for all~$x$, the restriction to almost all~$n$ in Theorem~4.1 is best case for~$b$.
+\begin{proof}
+Let $P$~be a program in standard form computing~$f$. Construct~$F$ from~$P$ by prepending a finite table lookup for inputs $x\le m$:
+\begin{center}
+\begin{tabular}{rll}
+1.&J(1,2,$r+2f(0)$)\\
+2.&S(2)\\
+3.&J(1,2,$r+2f(1)$)\\
+4.&S(2)\\
+$\vdots$&$\vdots$\\
+$2m+1$.&J(1,2,$r+2f(m)$)\\
+&Z(2)\\
+&P\\
+&J(1,1,$r+4$)\\
+$r$.&Z(1)\\
+&J(1,1,$r+4$)\\
+&Z(1)\\
+&S(1)
+\end{tabular}
+\end{center}
+Clearly $F$~computes~$f$. For inputs $x\le m$, two instructions are executed for each $0\le y<x$, then three additional instructions are executed before the computation halts, giving $t_F(x)=2x+3$ for $x\le m$ as desired.
+
+The remainder of the exercise follows immediately, since if $b(x)>2x+3$, then no matter which function~$f$ is chosen in Theorem~4.1, we know there exist programs computing~$f$ in time bounded by~$b$ on arbitrarily large finite subsets of~$\N$.
+\end{proof}
+
+\exercise{2}
+Let $\Phi_e$~be the storage space computational complexity measure from Example~1.5.2. Then
+\begin{enumerate}[itemsep=0pt]
+\item[(i)] if $\phi_e(x)$~is defined, then $\Phi_e(x)\ge\max(x,\phi_e(x))$.
+\item[(ii)] if $f$~is a total computable function and $X\subseteq\N$ is finite, there exists a program~$P_e$ computing~$f$ with $\Phi_e(x)=\max(x,f(x))$ for all $x\in X$.
+\end{enumerate}
+\begin{proof}
+If $\phi_e(x)$~is defined, then clearly $\Phi_e(x)\ge x$ since $x$~appears in~$R_1$ at the start of the computation and $\Phi_e(x)\ge\phi_e(x)$ since $\phi_e(x)$~appears in~$R_1$ at the end of the computation. Therefore $\Phi_e(x)\ge\max(x,\phi_e(x))$.
+
+Let $f$~be total and suppose $P$~computes~$f$. If $X\subseteq\N$ is finite, then we can construct from~$P$ a program~$P_e$ computing~$f$ which performs a finite table lookup for inputs $x\in X$ (cf.~the proof of Exercise~1). Then for inputs $x\in X$, $P_e$~will only store numbers $\le\max(x,f(x))$. It follows that $\Phi_e(x)=\max(x,f(x))$ for $x\in X$ as desired.
+\end{proof}
+
+\begin{thebibliography}{0}
+\bibitem{cutland80} Cutland, N.~J. \emph{Computability: An introduction to recursive function theory.} New York: Cambridge, 1980.
+\end{thebibliography}
+\end{document}
